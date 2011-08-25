@@ -1,0 +1,6 @@
+require "rubygems"
+require "rails"
+require "rails/test_help"
+require "active_support/core_ext"
+require "turn"
+require "hiccup/schedule"

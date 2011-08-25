@@ -1,0 +1,110 @@
+require "hiccup/convenience"
+require "active_support/concern"
+
+
+module Hiccup
+  module Validatable
+    include Convenience
+    extend ActiveSupport::Concern
+    
+    
+    Kinds = [:never, :weekly, :monthly, :annually]
+    
+    
+    # !todo: use ActiveModel:Validation rather than a custom method
+    included do
+      validate                    :validate_recurrence
+    end
+    
+    
+  private
+    
+    
+    # !todo: use i18n to let clients of this library supply their own wording
+    def validate_recurrence
+      case kind
+      when :never;
+      when :weekly;     validate_weekly_recurrence
+      when :monthly;    validate_monthly_recurrence
+      when :annually;
+      else;             invalid_kind!
+      end
+      
+      errors.add(:start_date, "is a #{self.start_date.class} not a Date") unless self.start_date.is_a?(Date)
+      errors.add(:skip, "is not a positive integer") unless (skip.is_a? Fixnum) and (skip > 0)
+      if ends?
+        if self.end_date.is_a? Date
+          errors.add(:end_date, "cannot be before start") if (self.end_date < self.start_date)
+        else
+          errors.add(:end_date, "is a #{self.end_date.class} not a Date")
+        end
+      end
+    end
+    
+    
+    def validate_weekly_recurrence
+      if !pattern.is_a?(Array)
+        errors.add(:pattern, "is a #{pattern.class}. It should be an array")
+      elsif pattern.empty?
+        errors.add(:pattern, "is empty. It should contain a list of weekdays")
+      elsif (invalid_names = pattern - Date::DAYNAMES).any?
+        errors.add(:pattern, "should contain only weekdays. (#{invalid_names.to_sentence} are invalid)")
+      end
+    end
+    
+    
+    def validate_monthly_recurrence
+      if !pattern.is_a?(Array)
+        errors.add(:pattern, "is a #{pattern.class}. It should be an array")
+      elsif pattern.empty?
+        errors.add(:pattern, "is empty. It should contain a list of monthly occurrences")
+      elsif pattern.select(&method(:invalid_occurrence?)).any?
+        errors.add(:pattern, "contains invalid monthly occurrences")
+      end
+    end
+    
+    
+    def invalid_occurrence?(occurrence)
+      !valid_occurrence?(occurrence)
+    end
+    
+    def valid_occurrence?(occurrence)
+      if occurrence.is_a?(Array)
+        i, wd = occurrence
+        Date::DAYNAMES.member?(wd) && i.is_a?(Fixnum) && ((i == -1) || (1..6).include?(i))
+      else
+        i = occurrence
+        i.is_a?(Fixnum) && (1..31).include?(i)
+      end
+    end
+    
+    
+    def invalid_kind!
+      errors.add(:kind, "is not recognized. It must be one of #{Kinds.collect{|kind| "'#{kind}'"}.to_sentence(:two_words_connector => " or ", :last_word_connector => ", or ")}.")
+    end
+    
+    
+    # def valid_occurrence?(occurrence)
+    #   if occurrence.is_a?(Array)
+    #     ordinal, kind = occurrence
+    #     
+    #     errors.add(:kind, "is not a valid monthly occurrence kind") unless Date::DAYNAMES.member?(kind)
+    #     if ordinal.is_a?(Fixnum)
+    #       errors.add(:ordinal, "is not a valid integer") unless (ordinal==-1) or (1..6).include?(ordinal)        
+    #     else
+    #       errors.add(:ordinal, "is not an integer")
+    #     end
+    #   else
+    #     ordinal = occurrence
+    #     
+    #     if ordinal.is_a?(Fixnum)
+    #       errors.add(:ordinal, "is not an integer between 1 and 31") unless (1..31).include?(ordinal)
+    #     else
+    #       errors.add(:ordinal, "is not an integer")
+    #     end
+    #   end
+    # end
+    
+    
+  end
+end
