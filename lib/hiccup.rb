@@ -16,18 +16,21 @@ require "hiccup/version"
 #   ever ends
 # * end_date - The date when the recurrence pattern ends
 # * skip - The number of instances to skip                        # <== change this to :interval
-# * pattern - An array of recurrence rules
+# * weekly_pattern - An array of recurrence rules for a
+#   weekly recurrence
+# * monthly_pattern - An array of recurrence rules for a
+#   monthly recurrence
 #
 #   Examples:
 #    
 #    Every other Monday
-#    :kind => :weekly, :pattern => ["Monday"]
+#    :kind => :weekly, :weekly_pattern => ["Monday"]
 #
 #    Every year on June 21 (starting in 1999)
 #    :kind => :yearly, :start_date => Date.new(1999, 6, 21)
 #
 #    The second and fourth Sundays of the month
-#    :kind => :monthly, :pattern => [[2, "Sunday"], [4, "Sunday"]]
+#    :kind => :monthly, :monthly_pattern => [[2, "Sunday"], [4, "Sunday"]]
 #
 #
 module Hiccup

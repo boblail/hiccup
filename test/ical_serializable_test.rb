@@ -21,7 +21,7 @@ class IcalSerializableTest < ActiveSupport::TestCase
     "Simple weekly recurrence",
     "DTSTART;VALUE=DATE-TIME:20090101T000000Z\nRRULE:FREQ=WEEKLY;BYDAY=SU\n",
     { :kind => :weekly,
-      :pattern => %w{Sunday},
+      :weekly_pattern => %w{Sunday},
       :start_date => DateTime.new(2009, 1, 1)
     })
   
@@ -30,7 +30,7 @@ class IcalSerializableTest < ActiveSupport::TestCase
     "Complex weekly recurrence (with an interval)",
     "DTSTART;VALUE=DATE-TIME:20090101T000000Z\nRRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=TU,TH\n",
     { :kind => :weekly,
-      :pattern => %w{Tuesday Thursday},
+      :weekly_pattern => %w{Tuesday Thursday},
       :start_date => DateTime.new(2009, 1, 1),
       :skip => 2
     })
@@ -57,7 +57,7 @@ class IcalSerializableTest < ActiveSupport::TestCase
     "Simple monthly recurrence",
     "DTSTART;VALUE=DATE-TIME:20090315T000000Z\nRRULE:FREQ=MONTHLY;BYMONTHDAY=4\n",
     { :kind => :monthly,
-      :pattern => [4],
+      :monthly_pattern => [4],
       :start_date => DateTime.new(2009, 3, 15)
     })
   
@@ -66,7 +66,7 @@ class IcalSerializableTest < ActiveSupport::TestCase
     "Monthly recurrence on the last Tuesday of the month",
     "DTSTART;VALUE=DATE-TIME:20090315T000000Z\nRRULE:FREQ=MONTHLY;BYDAY=-1TU\n",
     { :kind => :monthly,
-      :pattern => [[-1, "Tuesday"]],
+      :monthly_pattern => [[-1, "Tuesday"]],
       :start_date => DateTime.new(2009, 3, 15)
     })
   
@@ -75,7 +75,7 @@ class IcalSerializableTest < ActiveSupport::TestCase
     "Complex monthly recurrence",
     "DTSTART;VALUE=DATE-TIME:20090315T000000Z\nRRULE:FREQ=MONTHLY;BYDAY=2SU,4SU\n",
     { :kind => :monthly,
-      :pattern => [[2, "Sunday"], [4, "Sunday"]],
+      :monthly_pattern => [[2, "Sunday"], [4, "Sunday"]],
       :start_date => DateTime.new(2009, 3, 15)
     })
   

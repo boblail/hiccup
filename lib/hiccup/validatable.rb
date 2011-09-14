@@ -43,23 +43,23 @@ module Hiccup
     
     
     def validate_weekly_recurrence
-      if !pattern.is_a?(Array)
-        errors.add(:pattern, "is a #{pattern.class}. It should be an array")
-      elsif pattern.empty?
-        errors.add(:pattern, "is empty. It should contain a list of weekdays")
-      elsif (invalid_names = pattern - Date::DAYNAMES).any?
-        errors.add(:pattern, "should contain only weekdays. (#{invalid_names.to_sentence} are invalid)")
+      if !weekly_pattern.is_a?(Array)
+        errors.add(:weekly_pattern, "is a #{weekly_pattern.class}. It should be an array")
+      elsif weekly_pattern.empty?
+        errors.add(:weekly_pattern, "is empty. It should contain a list of weekdays")
+      elsif (invalid_names = weekly_pattern - Date::DAYNAMES).any?
+        errors.add(:weekly_pattern, "should contain only weekdays. (#{invalid_names.to_sentence} are invalid)")
       end
     end
     
     
     def validate_monthly_recurrence
-      if !pattern.is_a?(Array)
-        errors.add(:pattern, "is a #{pattern.class}. It should be an array")
-      elsif pattern.empty?
-        errors.add(:pattern, "is empty. It should contain a list of monthly occurrences")
-      elsif pattern.select(&method(:invalid_occurrence?)).any?
-        errors.add(:pattern, "contains invalid monthly occurrences")
+      if !monthly_pattern.is_a?(Array)
+        errors.add(:monthly_pattern, "is a #{monthly_pattern.class}. It should be an array")
+      elsif monthly_pattern.empty?
+        errors.add(:monthly_pattern, "is empty. It should contain a list of monthly occurrences")
+      elsif monthly_pattern.select(&method(:invalid_occurrence?)).any?
+        errors.add(:monthly_pattern, "contains invalid monthly occurrences")
       end
     end
     

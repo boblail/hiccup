@@ -21,7 +21,7 @@ class EnumerableTest < ActiveSupport::TestCase
   def test_occurs_on_weekly
     schedule = Schedule.new({
       :kind => :weekly,
-      :pattern => %w{Monday Wednesday Friday},
+      :weekly_pattern => %w{Monday Wednesday Friday},
       :start_date => Date.new(2009,3,15)})
     assert schedule.occurs_on(Date.new(2009,5,1)),    "MWF schedule starting 3/15/09 should occur on 5/1/2009"
     assert schedule.occurs_on(Date.new(2009,5,11)),   "MWF schedule starting 3/15/09 should occur on 5/11/2009"
@@ -44,7 +44,7 @@ class EnumerableTest < ActiveSupport::TestCase
   def test_weekly_occurrences_during_month
     schedule = Schedule.new({
       :kind => :weekly,
-      :pattern => %w{Monday Wednesday Friday},
+      :weekly_pattern => %w{Monday Wednesday Friday},
       :start_date => Date.new(2009,3,15),
       :ends => true,
       :end_date => Date.new(2009,11,30)})
@@ -58,7 +58,7 @@ class EnumerableTest < ActiveSupport::TestCase
 
     schedule = Schedule.new({
       :kind => :weekly,
-      :pattern => %w{Monday},
+      :weekly_pattern => %w{Monday},
       :start_date => Date.new(2010,6,14),
       :ends => true,
       :end_date => Date.new(2010,6,21)})
@@ -72,7 +72,7 @@ class EnumerableTest < ActiveSupport::TestCase
   def test_monthly_occurrences_during_month
     schedule = Schedule.new({
       :kind => :monthly,
-      :pattern => [[2, "Sunday"], [4, "Sunday"]],
+      :monthly_pattern => [[2, "Sunday"], [4, "Sunday"]],
       :start_date => Date.new(2004,3,15)})
     dates = schedule.occurrences_during_month(2009,12).map {|date| date.day}
     expected_dates = [13,27]
@@ -113,7 +113,7 @@ class EnumerableTest < ActiveSupport::TestCase
     occurrence = [1, "Wednesday"]
     schedule = Schedule.new({
       :kind => :monthly,
-      :pattern => [occurrence],
+      :monthly_pattern => [occurrence],
       :start_date => Date.new(2011,1,1)})
     expected_dates = [[1,5], [2,2], [3,2], [4,6], [5,4], [6,1], [7,6], [8,3], [9,7], [10,5], [11,2], [12,7]]
     expected_dates.map! {|pair| Date.new(2011, *pair)}
@@ -130,7 +130,7 @@ class EnumerableTest < ActiveSupport::TestCase
   def test_weekly_recurrence_and_skip
     schedule = Schedule.new({
       :kind => :weekly,
-      :pattern => ["Monday"],
+      :weekly_pattern => %w{Monday},
       :skip => 3,
       :start_date => Date.new(2011,1,1)})
     expected_dates = [[1,3], [1,24], [2,14], [3,7], [3,28]]
@@ -148,7 +148,7 @@ class EnumerableTest < ActiveSupport::TestCase
   def test_monthly_recurrence_and_skip
     schedule = Schedule.new({
       :kind => :monthly,
-      :pattern => [[1, "Wednesday"]],
+      :monthly_pattern => [[1, "Wednesday"]],
       :skip => 2,
       :start_date => Date.new(2011,1,1)})
     expected_dates = [[1,5], [3,2], [5,4], [7,6], [9,7], [11,2]]
@@ -192,7 +192,7 @@ class EnumerableTest < ActiveSupport::TestCase
     start = Date.new(2010,6,1)
     schedule = Schedule.new({
       :kind => :monthly,
-      :pattern => [[5, "Monday"]],
+      :monthly_pattern => [[5, "Monday"]],
       :start_date => start})
     assert_equal "The fifth Monday of every month", schedule.humanize
     
@@ -211,7 +211,7 @@ class EnumerableTest < ActiveSupport::TestCase
     fifth_sunday = Date.new(2010, 8, 29)
     schedule = Schedule.new({
       :kind => :monthly,
-      :pattern => [[5, "Sunday"]],
+      :monthly_pattern => [[5, "Sunday"]],
       :start_date => fifth_sunday})
     assert_equal "The fifth Sunday of every month", schedule.humanize
     
@@ -235,7 +235,7 @@ class EnumerableTest < ActiveSupport::TestCase
   def test_recurs_on31st
     schedule = Schedule.new({
       :kind => :monthly,
-      :pattern => [31],
+      :monthly_pattern => [31],
       :start_date => Date.new(2008, 2, 29)
     });
     

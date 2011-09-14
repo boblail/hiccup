@@ -56,7 +56,7 @@ module Hiccup
       
       
       def add_weekly_rule
-        add_rule("WEEKLY", :byday => abbreviate_weekdays(@obj.pattern))
+        add_rule("WEEKLY", :byday => abbreviate_weekdays(@obj.weekly_pattern))
       end
       
       
@@ -64,7 +64,7 @@ module Hiccup
       def add_monthly_rule
         byday = []
         bymonthday = []
-        @obj.pattern.each do |occurrence|
+        @obj.monthly_pattern.each do |occurrence|
           if occurrence.is_a?(Array)
             i, weekday = occurrence
             byday << "#{i}#{abbreviate_weekday(weekday)}"
@@ -107,7 +107,7 @@ module Hiccup
       
       def parse_weekly_rule(rule)
         @obj.kind = :weekly
-        @obj.pattern = backmap_weekdays(rule.by_list[:byday])
+        @obj.weekly_pattern = backmap_weekdays(rule.by_list[:byday])
         parse_rule(rule)
       end
       
@@ -122,13 +122,13 @@ module Hiccup
       
       def parse_monthly_bymonthyday(bymonthday)
         (bymonthday || []).each do |bymonthday|
-          @obj.pattern = @obj.pattern + [bymonthday.ordinal]
+          @obj.monthly_pattern = @obj.monthly_pattern + [bymonthday.ordinal]
         end
       end
       
       def parse_monthly_byday(byday)
         (byday || []).each do |byday|
-          @obj.pattern = @obj.pattern + [[byday.index, backmap_weekday(byday)]]
+          @obj.monthly_pattern = @obj.monthly_pattern + [[byday.index, backmap_weekday(byday)]]
         end
       end
       

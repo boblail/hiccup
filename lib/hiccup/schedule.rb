@@ -15,16 +15,17 @@ module Hiccup
     
     
     def initialize(options={})
-      @kind       = options[:kind] || :never
-      @start_date = options[:start_date] || Date.today
-      @ends       = options.key?(:ends) ? options[:ends] : false
-      @end_date   = options[:end_date]
-      @skip       = options[:skip] || options[:interval] || 1
-      @pattern    = options[:pattern] || []
+      @kind             = options[:kind] || :never
+      @start_date       = options[:start_date] || Date.today
+      @ends             = options.key?(:ends) ? options[:ends] : false
+      @end_date         = options[:end_date]
+      @skip             = options[:skip] || options[:interval] || 1
+      @weekly_pattern   = options[:weekly_pattern] || []
+      @monthly_pattern  = options[:monthly_pattern] || []
     end
     
     
-    attr_accessor :kind, :start_date, :ends, :end_date, :skip, :pattern
+    attr_accessor :kind, :start_date, :ends, :end_date, :skip, :weekly_pattern, :monthly_pattern
     
     
     def to_hash
@@ -33,7 +34,8 @@ module Hiccup
         :start_date => start_date,
         :ends => ends,
         :end_date => end_date,
-        :pattern => pattern
+        :weekly_pattern => weekly_pattern,
+        :monthly_pattern => monthly_pattern
       }
     end
     

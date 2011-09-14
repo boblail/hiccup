@@ -25,16 +25,16 @@ module Hiccup
     
     
     def weekly_humanize
-      weekdays = pattern.map(&:humanize).to_sentence
-      if skip == 1 || pattern.length == 1
-        sentence("Every", ordinal, weekdays)
+      weekdays_sentece = weekly_pattern.map(&:humanize).to_sentence
+      if skip == 1 || weekly_pattern.length == 1
+        sentence("Every", ordinal, weekdays_sentece)
       else
-        sentence(weekdays, "of every", ordinal, "week")
+        sentence(weekdays_sentece, "of every", ordinal, "week")
       end
     end
     
     def monthly_humanize
-      monthly_occurrences = pattern.map(&method(:monthly_occurrence_to_s)).to_sentence
+      monthly_occurrences = monthly_pattern.map(&method(:monthly_occurrence_to_s)).to_sentence
       sentence("The", monthly_occurrences, "of every", ordinal, "month")
     end
     

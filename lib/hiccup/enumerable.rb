@@ -44,7 +44,7 @@ module Hiccup
       
       when :weekly
         wday = date.wday
-        pattern.each do |weekday|
+        weekly_pattern.each do |weekday|
           wd = Date::DAYNAMES.index(weekday)
           wd = wd + 7 if wd < wday
           days_in_the_future = wd - wday
@@ -57,7 +57,7 @@ module Hiccup
         end
       
       when :monthly
-        pattern.each do |occurrence|
+        monthly_pattern.each do |occurrence|
           temp = nil
           (0...30).each do |i| # If an occurrence doesn't occur this month, try up to 30 months in the future
             temp = monthly_occurrence_to_date(occurrence, i.months.after(date))
@@ -113,7 +113,7 @@ module Hiccup
       
       when :weekly
         wday = date.wday
-        pattern.each do |weekday|
+        weekly_pattern.each do |weekday|
           wd = Date::DAYNAMES.index(weekday)
           wd = wd - 7 if wd > wday
           days_in_the_past = wday - wd
@@ -126,7 +126,7 @@ module Hiccup
         end
       
       when :monthly
-        pattern.each do |occurrence|
+        monthly_pattern.each do |occurrence|
           temp = nil
           (0...30).each do |i| # If an occurrence doesn't occur this month, try up to 30 months in the past
             temp = monthly_occurrence_to_date(occurrence, i.months.before(date))

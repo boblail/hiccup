@@ -9,18 +9,18 @@ class ValidatableTest < ActiveSupport::TestCase
   def test_invalid_recurrence
     # Test nil weekly recurrence
     r = Schedule.new(:kind => :weekly)
-    assert !r.valid?,                                   "Recurrence should be invalid: pattern is empty"
-    assert r.errors[:pattern].any?,                     "pattern should be invalid if empty and kind is 'weekly'"
+    assert !r.valid?,                                   "Recurrence should be invalid: weekly_pattern is empty"
+    assert r.errors[:weekly_pattern].any?,              "weekly_pattern should be invalid if empty and kind is 'weekly'"
     
     # Test nil monthly recurrence
     r = Schedule.new(:kind => :monthly)
-    assert !r.valid?,                                   "Recurrence should be invalid: pattern is empty"
-    assert r.errors[:pattern].any?,                     "pattern should be invalid if empty and kind is 'monthly'"
+    assert !r.valid?,                                   "Recurrence should be invalid: monthly_pattern is empty"
+    assert r.errors[:monthly_pattern].any?,             "monthly_pattern should be invalid if empty and kind is 'monthly'"
     
     # Test invalid monthly recurrence
-    r = Schedule.new(:kind => :monthly, :pattern => [[2, "holiday"]])
-    assert !r.valid?,                                   "Recurrence should be invalid: pattern is invalid"
-    assert r.errors[:pattern].any?,                     "pattern should be invalid: 'holiday' is not a valid MonthlyOccurrenceType"
+    r = Schedule.new(:kind => :monthly, :monthly_pattern => [[2, "holiday"]])
+    assert !r.valid?,                                   "Recurrence should be invalid: monthly_pattern is invalid"
+    assert r.errors[:monthly_pattern].any?,             "monthly_pattern should be invalid: 'holiday' is not a valid MonthlyOccurrenceType"
   end
   
   
@@ -45,17 +45,17 @@ class ValidatableTest < ActiveSupport::TestCase
   
   
   def test_valid_weekly_recurrence
-    recurrence = Schedule.new(:kind => :weekly, :pattern => %w[Tuesday])
+    recurrence = Schedule.new(:kind => :weekly, :weekly_pattern => %w{Tuesday})
     assert_valid(recurrence)
   end
   
   
   
   def test_valid_monthly_recurrence
-    recurrence = Schedule.new(:kind => :monthly, :pattern => [2])
+    recurrence = Schedule.new(:kind => :monthly, :monthly_pattern => [2])
     assert_valid(recurrence)
     
-    recurrence = Schedule.new(:kind => :monthly, :pattern => [[2, "Thursday"]])
+    recurrence = Schedule.new(:kind => :monthly, :monthly_pattern => [[2, "Thursday"]])
     assert_valid(recurrence)
   end
   

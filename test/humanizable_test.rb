@@ -19,39 +19,39 @@ class HumanizableTest < ActiveSupport::TestCase
   
   test_humanize(
     "Every Sunday",
-    {:kind => :weekly, :pattern => %w[Sunday]})
+    {:kind => :weekly, :weekly_pattern => %w[Sunday]})
     
   test_humanize(
     "Every other Sunday",
-    {:kind => :weekly, :pattern => %w[Sunday], :skip => 2})
+    {:kind => :weekly, :weekly_pattern => %w[Sunday], :skip => 2})
     
   test_humanize(
     "Every Sunday and Monday",
-    {:kind => :weekly, :pattern => %w[Sunday Monday]})
+    {:kind => :weekly, :weekly_pattern => %w[Sunday Monday]})
     
   test_humanize(
     "Monday, Wednesday, and Friday of every third week",
-    {:kind => :weekly, :pattern => %w[Monday Wednesday Friday], :skip => 3})
+    {:kind => :weekly, :weekly_pattern => %w[Monday Wednesday Friday], :skip => 3})
     
   test_humanize(
     "The 4th of every month",
-    {:kind => :monthly, :pattern => [4]})
+    {:kind => :monthly, :monthly_pattern => [4]})
     
   test_humanize(
     "The 4th and 5th of every month",
-    {:kind => :monthly, :pattern => [4,5]})
+    {:kind => :monthly, :monthly_pattern => [4,5]})
     
   test_humanize(
     "The first Monday of every month",
-    {:kind => :monthly, :pattern => [[1, "Monday"]]})
+    {:kind => :monthly, :monthly_pattern => [[1, "Monday"]]})
     
   test_humanize(
     "The last Tuesday of every month",
-    {:kind => :monthly, :pattern => [[-1, "Tuesday"]]})
+    {:kind => :monthly, :monthly_pattern => [[-1, "Tuesday"]]})
     
   test_humanize(
     "The first Monday and third Monday of every other month",
-    {:kind => :monthly, :pattern => [[1, "Monday"], [3, "Monday"]], :skip => 2})
+    {:kind => :monthly, :monthly_pattern => [[1, "Monday"], [3, "Monday"]], :skip => 2})
     
   test_humanize(
     "Every year on #{Date.today.strftime('%b %d')}",
