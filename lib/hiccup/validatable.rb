@@ -77,7 +77,7 @@ module Hiccup
     
     
     def invalid_kind!
-      errors.add(:kind, "is not recognized. It must be one of #{Kinds.collect{|kind| "'#{kind}'"}.to_sentence(:two_words_connector => " or ", :last_word_connector => ", or ")}.")
+      errors.add(:kind, "#{kind.inspect} is not recognized. It must be one of #{Kinds.collect{|kind| ":#{kind}"}.to_sentence(:two_words_connector => " or ", :last_word_connector => ", or ")}.")
     end
     
     
