@@ -39,7 +39,7 @@ module Hiccup
     end
     
     def yearly_humanize
-      sentence("Every", ordinal, "year on", self.start_date.strftime('%b %d'))
+      sentence("Every", ordinal, "year on", self.start_date.strftime('%B %d'))
     end
     
     
