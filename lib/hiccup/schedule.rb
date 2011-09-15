@@ -15,7 +15,7 @@ module Hiccup
     
     
     def initialize(options={})
-      @kind             = options[:kind] || :never
+      @kind             =(options[:kind] || :never).to_sym
       @start_date       = options[:start_date] || Date.today
       @ends             = options.key?(:ends) ? options[:ends] : false
       @end_date         = options[:end_date]
