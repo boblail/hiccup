@@ -8,9 +8,6 @@ module Hiccup
     extend ActiveSupport::Concern
     
     
-    Kinds = [:never, :weekly, :monthly, :annually]
-    
-    
     # !todo: use ActiveModel:Validation rather than a custom method
     included do
       validate                    :validate_recurrence

@@ -36,6 +36,9 @@ require "hiccup/version"
 module Hiccup
   
   
+  Kinds = [:never, :weekly, :monthly, :annually]
+  
+  
   def hiccup(*modules)
     options = modules.extract_options!
     add_hiccup_modules(modules)
