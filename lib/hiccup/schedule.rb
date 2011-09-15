@@ -16,10 +16,10 @@ module Hiccup
     
     def initialize(options={})
       @kind             =(options[:kind] || :never).to_sym
-      @start_date       = options[:start_date] || Date.today
+      @start_date       =(options[:start_date] || Date.today).to_date
       @ends             = options.key?(:ends) ? options[:ends] : false
-      @end_date         = options[:end_date]
-      @skip             = options[:skip] || options[:interval] || 1
+      @end_date         = options[:end_date] ? options[:end_date].to_date : nil
+      @skip             =(options[:skip] || options[:interval] || 1).to_i
       @weekly_pattern   = options[:weekly_pattern] || []
       @monthly_pattern  = options[:monthly_pattern] || []
     end
