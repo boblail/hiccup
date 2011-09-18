@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "ri_cal"
   s.add_development_dependency "rails"
   s.add_development_dependency "turn"
+  s.add_development_dependency "simplecov"
   
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
