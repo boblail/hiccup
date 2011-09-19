@@ -27,6 +27,17 @@ class IcalSerializableTest < ActiveSupport::TestCase
   
   
   test_roundtrip(
+    "Simple weekly recurrence (with an end date)",
+    "DTSTART;VALUE=DATE-TIME:20090101T000000Z\nRRULE:FREQ=WEEKLY;UNTIL=20091231T000000Z;BYDAY=SU\n",
+    { :kind => :weekly,
+      :weekly_pattern => %w{Sunday},
+      :start_date => DateTime.new(2009, 1, 1),
+      :end_date => DateTime.new(2009, 12, 31),
+      :ends => true
+    })
+  
+  
+  test_roundtrip(
     "Complex weekly recurrence (with an interval)",
     "DTSTART;VALUE=DATE-TIME:20090101T000000Z\nRRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=TU,TH\n",
     { :kind => :weekly,
