@@ -17,6 +17,20 @@ class IcalSerializableTest < ActiveSupport::TestCase
   end
   
   
+  def test_parsing_empty_recurrence
+    schedule = Schedule.from_ical("")
+    assert_equal :never, schedule.kind
+  end
+  
+  
+  test_roundtrip(
+    "No recurrence",
+    "DTSTART;VALUE=DATE-TIME:20090101T000000Z\n",
+    { :kind => :never,
+      :start_date => DateTime.new(2009, 1, 1)
+    })
+  
+  
   test_roundtrip(
     "Simple weekly recurrence",
     "DTSTART;VALUE=DATE-TIME:20090101T000000Z\nRRULE:FREQ=WEEKLY;BYDAY=SU\n",

@@ -37,7 +37,7 @@ module Hiccup
         component = RiCal.parse_string(component_ics).first
         
         @obj = @klass.new
-        @obj.start_date = component.dtstart_property.to_datetime
+        @obj.start_date = component.dtstart_property.try(:to_datetime)
         component.rrule_property.each do |rule|
           case rule.freq
           when "WEEKLY";    parse_weekly_rule(rule)
