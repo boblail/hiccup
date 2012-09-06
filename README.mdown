@@ -1,0 +1,61 @@
+# Hiccup
+
+Hiccup mixes a-la-cart recurrence features into your recurring model. It doesn't dictate the data structure of your model, just the interface. It works just like Devise does for authenticatable models.
+
+Hiccup does provide an extremely lightweight `Schedule` class that mixes in all of Hiccup's feature, but you don't have to use Hiccup's Schedul if you don't want to.
+
+### Usage
+
+    class Schedule
+      extend Hiccup
+      
+      hiccup :enumerable,
+             :validatable,
+             :humanizable,
+             :serializable => [:ical]
+      
+    end
+
+### Interface
+
+Hiccup requires that a recurring object expose the following properties
+
+  - **kind**: one of `:never`, `:weekly`, `:monthly`, `:annually`
+  - **start_date**: the date when the recurrence should start
+  - **ends**: either `true` or `false`, indicating whether the recurrence has an end date
+  - **end_date**: the date when the recurrence should end
+  - **skip**: the number of instances to skip (You'd set `skip` to 2 to specify an event that occurs every _other_ week, for example)
+  - **weekly_pattern**: an array of weekdays on which a weekly event should recur
+  - **monthly_pattern**: an array of recurrence rules for a monthly event
+
+### Examples
+
+
+    Every other Monday
+    :kind => :weekly, :weekly_pattern => ["Monday"]
+    
+    Every year on June 21 (starting in 1999)
+    :kind => :yearly, :start_date => Date.new(1999, 6, 21)
+    
+    The second and fourth Sundays of the month
+    :kind => :monthly, :monthly_pattern => [[2, "Sunday"], [4, "Sunday"]]
+
+
+
+# Modules
+
+### Enumerable
+
+Supplies methods for creating instances of a recurring pattern
+
+### Validatable
+
+Mixes in ActiveModel validations for recurrence models
+
+### Humanizable
+
+Represents a recurring pattern in a human-readable string
+
+### Serializable
+
+Supports serializing and deserializing a recurrence pattern to an array of formats
