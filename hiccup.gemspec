@@ -8,17 +8,19 @@ Gem::Specification.new do |s|
   s.authors     = ["Bob Lail"]
   s.email       = ["bob.lailfamily@gmail.com"]
   s.homepage    = "http://boblail.github.com/hiccup/"
-  s.summary     = %q{Recurrence features a-la-cart}
-  s.description = %q{Recurrence features a-la-cart}
+  s.summary     = %q{A library for working with things that recur}
+  s.description = %q{Hiccup mixes a-la-cart recurrence features into your data structure. It doesn't dictate the data structure, just the interface.}
   
   s.rubyforge_project = "hiccup"
   
-  s.add_dependency "activesupport"
+  s.add_dependency "activesupport", "~> 3.2.8"
+  s.add_dependency "builder"
   
   s.add_development_dependency "ri_cal"
-  s.add_development_dependency "rails"
+  s.add_development_dependency "rails", "~> 3.2.8"
   s.add_development_dependency "turn"
   s.add_development_dependency "simplecov"
+  s.add_development_dependency "pry"
   
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
