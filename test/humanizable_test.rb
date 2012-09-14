@@ -67,4 +67,14 @@ class HumanizableTest < ActiveSupport::TestCase
   
   
   
+  test "should not have spaces in front of day numbers" do
+    independence_day = Schedule.new({
+      :kind => :annually,
+      :start_date => Date.new(2012, 7, 4)
+    })
+    assert_equal "Every year on July 4", independence_day.humanize
+  end
+  
+  
+  
 end
