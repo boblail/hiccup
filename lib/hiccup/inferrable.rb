@@ -33,14 +33,23 @@ module Hiccup
           schedule.kind = :monthly
           schedule.start_date = start_date
           schedule.end_date = end_date
-          schedule.monthly_pattern = [4]
+          schedule.monthly_pattern = [start_date.day]
+        end
+        
+        guesses << self.new.tap do |schedule|
+          schedule.kind = :monthly
+          schedule.start_date = start_date
+          schedule.end_date = end_date
+          schedule.monthly_pattern = dates.map { |date|
+            [date.get_nth_wday_of_month, Date::DAYNAMES[date.wday]]
+          }.uniq
         end
         
         guesses << self.new.tap do |schedule|
           schedule.kind = :weekly
           schedule.start_date = start_date
           schedule.end_date = end_date
-          schedule.weekly_pattern = [Date::DAYNAMES[start_date.wday]]
+          schedule.weekly_pattern = dates.map(&:wday).uniq.map { |wday| Date::DAYNAMES[wday] }
         end
         
         guesses
@@ -52,7 +61,7 @@ module Hiccup
         top_score = 0
         best_guess = nil
         guesses.each do |guess|
-          score = guess_score(guess, dates)
+          score = score_guess(guess, dates)
           if score > top_score
             top_score = score
             best_guess = guess
@@ -61,11 +70,21 @@ module Hiccup
         best_guess
       end
       
-      def guess_score(guess, dates)
-        guess_dates = guess.occurrences_between(guess.start_date, guess.end_date)
-        failure_count = (dates - guess_dates).length
-        brick_count = (guess_dates - dates).length
-        1000 - (failure_count + brick_count)
+      def score_guess(guess, input_dates)
+        predicted_dates = guess.occurrences_between(guess.start_date, guess.end_date)
+        
+        # Failures are input dates that were not predicted by this guess
+        failure_count = (input_dates - predicted_dates).length
+        
+        # Bricks are dates that _were_ predicted by this guess but are not in the input
+        brick_count = (predicted_dates - input_dates).length
+        
+        pattern_complexity = 1
+        pattern_complexity = guess.weekly_pattern.length if guess.weekly?
+        pattern_complexity = guess.monthly_pattern.length if guess.monthly?
+        
+        # Failures are more serious than bricks
+        1000 - ((failure_count * 2.0) + brick_count + (pattern_complexity * 0.75))
       end
       
       
