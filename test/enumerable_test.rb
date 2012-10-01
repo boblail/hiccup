@@ -55,7 +55,7 @@ class EnumerableTest < ActiveSupport::TestCase
     dates = schedule.occurrences_during_month(2008,7).map {|date| date.day}
     expected_dates = []
     assert_equal expected_dates, dates,                 "occurrences_during_month should generate no occurrences if before start_date"
-
+    
     schedule = Schedule.new({
       :kind => :weekly,
       :weekly_pattern => %w{Monday},
@@ -95,6 +95,37 @@ class EnumerableTest < ActiveSupport::TestCase
     expected_dates = [expected_date]
     assert_equal expected_dates, schedule.occurrences_between(Date.new(2011,1,1), Date.new(2011,12,31))
     assert schedule.contains?(expected_date)
+  end
+  
+  
+  
+  def test_n_occurrences_before
+    schedule = Schedule.new({
+      :kind => :weekly,
+      :weekly_pattern => %w{Monday Wednesday Friday},
+      :start_date => Date.new(2009,3,15),
+      :ends => true,
+      :end_date => Date.new(2009,11,30)})
+    dates = schedule.n_occurrences_before(10, Date.new(2009, 10, 31)).map { |date| date.strftime("%Y-%m-%d") }
+    
+    expected_dates = ["2009-10-30", "2009-10-28", "2009-10-26",
+                      "2009-10-23", "2009-10-21", "2009-10-19",
+                      "2009-10-16", "2009-10-14", "2009-10-12",
+                      "2009-10-09" ]
+    assert_equal expected_dates, dates
+  end
+  
+  test "n_occurrences_before should return a shorter array if no events exist before the given date" do
+    schedule = Schedule.new({
+      :kind => :weekly,
+      :weekly_pattern => %w{Monday Wednesday Friday},
+      :start_date => Date.new(2009,3,15),
+      :ends => true,
+      :end_date => Date.new(2009,11,30)})
+    dates = schedule.n_occurrences_before(10, Date.new(2009, 3, 20)).map { |date| date.strftime("%Y-%m-%d") }
+    
+    expected_dates = ["2009-03-18", "2009-03-16"]
+    assert_equal expected_dates, dates
   end
   
   

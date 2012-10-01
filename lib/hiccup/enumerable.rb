@@ -178,6 +178,22 @@ module Hiccup
     
     
     
+    def n_occurrences_before(limit, date)
+      n_occurrences_on_or_before(limit, 1.day.before(date))
+    end
+    
+    def n_occurrences_on_or_before(limit, date)
+      occurrences = []
+      occurrence = first_occurrence_on_or_before(date)
+      while occurrence && occurrences.length < limit
+        occurrences << occurrence
+        occurrence = first_occurrence_before(occurrence)
+      end
+      occurrences
+    end
+    
+    
+    
     def monthly_occurrence_to_date(occurrence, date)
       year, month = date.year, date.month
       
