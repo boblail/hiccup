@@ -54,16 +54,20 @@ class HumanizableTest < ActiveSupport::TestCase
     {:kind => :monthly, :monthly_pattern => [[1, "Monday"], [3, "Monday"]], :skip => 2})
     
   test_humanize(
-    "Every year on #{Date.today.strftime('%B %d')}",
-    {:kind => :annually})
+    "Every year on October 1",
+    {:kind => :annually, start_date: Date.new(2012, 10, 1)})
     
   test_humanize(
-    "Every other year on #{Date.today.strftime('%B %d')}",
-    {:kind => :annually, :skip => 2})
+    "Every year on October 10",
+    {:kind => :annually, start_date: Date.new(2012, 10, 10)})
     
   test_humanize(
-    "Every fourth year on #{Date.today.strftime('%B %d')}",
-    {:kind => :annually, :skip => 4})
+    "Every other year on August 12",
+    {:kind => :annually, :skip => 2, start_date: Date.new(2012, 8, 12)})
+    
+  test_humanize(
+    "Every fourth year on January 31",
+    {:kind => :annually, :skip => 4, start_date: Date.new(1888, 1, 31)})
   
   
   
