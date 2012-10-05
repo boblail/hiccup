@@ -66,7 +66,8 @@ module Hiccup
           next unless temp
           
           remainder = months_between(temp, start_date) % skip
-          temp = monthly_occurrence_to_date(occurrence, (skip - remainder).months.after(temp)) if (remainder > 0)        
+          temp = monthly_occurrence_to_date(occurrence, (skip - remainder).months.after(temp)) if (remainder > 0)
+          next unless temp
           
           result = temp if !result || (temp < result)
         end
@@ -135,7 +136,8 @@ module Hiccup
           next unless temp
           
           remainder = months_between(temp, start_date) % skip
-          temp = monthly_occurrence_to_date(occurrence, remainder.months.before(temp)) if (remainder > 0)        
+          temp = monthly_occurrence_to_date(occurrence, remainder.months.before(temp)) if (remainder > 0)
+          next unless temp
           
           result = temp if !result || (temp > result)
         end

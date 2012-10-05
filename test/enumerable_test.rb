@@ -158,6 +158,24 @@ class EnumerableTest < ActiveSupport::TestCase
   
   
   
+  test "should not throw an exception when calculating monthly recurrence and skip causes a guess to be discarded" do
+    schedule = Schedule.new({
+      :kind => :monthly,
+      :monthly_pattern => [
+        [1, "Tuesday"],
+        [2, "Thursday"],
+        [3, "Thursday"],
+        [3, "Tuesday"],
+        [4, "Tuesday"],
+        [5, "Thursday"] ],
+      :skip => 3,
+      :start_date => Date.new(2012,3,6),
+      :end_date => Date.new(2012,3,29)})
+    schedule.occurrences_between(schedule.start_date, schedule.end_date)
+  end
+  
+  
+  
   def test_weekly_recurrence_and_skip
     schedule = Schedule.new({
       :kind => :weekly,
