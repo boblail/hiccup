@@ -50,12 +50,22 @@ class InferrableTest < ActiveSupport::TestCase
   
   
   
+  
   # Infers annual patterns
   
   test "should infer annual recurrence from something that occurs three years in a row" do
     dates = %w{2010-3-4 2011-3-4 2012-3-4}
     schedule = Schedule.infer(dates)
     assert_equal "Every year on March 4", schedule.humanize
+  end
+  
+  
+  # ... with skips
+  
+  test "should infer annual recurrence for something that occurs every other year" do
+    dates = %w{2010-3-4 2012-3-4 2014-3-4}
+    schedule = Schedule.infer(dates)
+    assert_equal "Every other year on March 4", schedule.humanize
   end
   
   
@@ -85,6 +95,16 @@ class InferrableTest < ActiveSupport::TestCase
   end
   
   
+  # ... with skips
+  
+  test "should infer monthly recurrence for something that occurs every other month" do
+    dates = %w{2012-2-4 2012-5-4 2012-8-4}
+    schedule = Schedule.infer(dates)
+    assert_equal "The 4th of every third month", schedule.humanize
+  end
+  
+  
+  
   
   # Infers weekly patterns
   
@@ -100,7 +120,17 @@ class InferrableTest < ActiveSupport::TestCase
     assert_equal "Every Tuesday and Thursday", schedule.humanize
   end
   
-  # ... with missing teeth ...
+  
+  # ... with skips
+  
+  test "should infer weekly recurrence for something that occurs every other week" do
+    dates = %w{2012-3-6 2012-3-8 2012-3-20 2012-3-22}
+    schedule = Schedule.infer(dates)
+    assert_equal "Tuesday and Thursday of every other week", schedule.humanize
+  end
+  
+  
+  # ... when some dates are missing from the input array
   
   test "should infer weekly recurrence from something that occurs once a week, with a missing date" do
     dates = %w{2012-3-4 2012-3-11 2012-3-25}

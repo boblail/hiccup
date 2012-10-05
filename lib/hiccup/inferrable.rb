@@ -23,33 +23,45 @@ module Hiccup
         end_date = dates.max
         guesses = []
         
-        guesses << self.new.tap do |schedule|
-          schedule.kind = :annually
-          schedule.start_date = start_date
-          schedule.end_date = end_date
+        
+        (1...5).each do |skip|
+          guesses << self.new.tap do |schedule|
+            schedule.kind = :annually
+            schedule.start_date = start_date
+            schedule.end_date = end_date
+            schedule.skip = skip
+          end
         end
         
-        guesses << self.new.tap do |schedule|
-          schedule.kind = :monthly
-          schedule.start_date = start_date
-          schedule.end_date = end_date
-          schedule.monthly_pattern = [start_date.day]
+        (1...5).each do |skip|
+          guesses << self.new.tap do |schedule|
+            schedule.kind = :monthly
+            schedule.start_date = start_date
+            schedule.end_date = end_date
+            schedule.skip = skip
+            schedule.monthly_pattern = [start_date.day]
+          end
+          
+          guesses << self.new.tap do |schedule|
+            schedule.kind = :monthly
+            schedule.start_date = start_date
+            schedule.end_date = end_date
+            schedule.skip = skip
+            schedule.monthly_pattern = dates.map { |date|
+              [date.get_nth_wday_of_month, Date::DAYNAMES[date.wday]]
+            }.uniq
+          end
         end
         
-        guesses << self.new.tap do |schedule|
-          schedule.kind = :monthly
-          schedule.start_date = start_date
-          schedule.end_date = end_date
-          schedule.monthly_pattern = dates.map { |date|
-            [date.get_nth_wday_of_month, Date::DAYNAMES[date.wday]]
-          }.uniq
-        end
-        
-        guesses << self.new.tap do |schedule|
-          schedule.kind = :weekly
-          schedule.start_date = start_date
-          schedule.end_date = end_date
-          schedule.weekly_pattern = dates.map(&:wday).uniq.map { |wday| Date::DAYNAMES[wday] }
+        (1...5).each do |skip|
+          guesses << self.new.tap do |schedule|
+            schedule.kind = :weekly
+            schedule.start_date = start_date
+            schedule.end_date = end_date
+            schedule.skip = skip
+            # schedule.weekly_pattern = histogram_of_wdays.keys.map { |wday| Date::DAYNAMES[wday] }
+            schedule.weekly_pattern = dates.map(&:wday).uniq.map { |wday| Date::DAYNAMES[wday] }
+          end
         end
         
         guesses
