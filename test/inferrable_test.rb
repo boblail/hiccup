@@ -28,7 +28,7 @@ class InferrableTest < ActiveSupport::TestCase
   
   
   
-  test "should prefer guesses that predict too many results over guesses that predict too few results" do
+  test "should prefer guesses that predict too many results over guesses that predict too few" do
     
     # In this stream of dates, we could guess an annual recurrence on 1/15
     # or a monthly recurrence on the 15th.
@@ -51,9 +51,9 @@ class InferrableTest < ActiveSupport::TestCase
   
   
   
-  # Infers annual patterns
+  # Infers annual schedules
   
-  test "should infer annual recurrence from something that occurs three years in a row" do
+  test "should infer an annual" do
     dates = %w{2010-3-4 2011-3-4 2012-3-4}
     schedule = Schedule.infer(dates)
     assert_equal "Every year on March 4", schedule.humanize
@@ -62,7 +62,7 @@ class InferrableTest < ActiveSupport::TestCase
   
   # ... with skips
   
-  test "should infer annual recurrence for something that occurs every other year" do
+  test "should infer a schedule that occurs every other year" do
     dates = %w{2010-3-4 2012-3-4 2014-3-4}
     schedule = Schedule.infer(dates)
     assert_equal "Every other year on March 4", schedule.humanize
@@ -70,9 +70,9 @@ class InferrableTest < ActiveSupport::TestCase
   
   
   
-  # Infers monthly patterns
+  # Infers monthly schedules
   
-  test "should infer monthly recurrence from something that occurs three months in a row on the same date" do
+  test "should infer a monthly schedule that occurs on a date" do
     dates = %w{2012-2-4 2012-3-4 2012-4-4}
     schedule = Schedule.infer(dates)
     assert_equal "The 4th of every month", schedule.humanize
@@ -82,13 +82,13 @@ class InferrableTest < ActiveSupport::TestCase
     assert_equal "The 17th of every month", schedule.humanize
   end
   
-  test "should infer monthly recurrence from something that occurs three months in a row on the second Monday of the month" do
+  test "should infer a monthly schedule that occurs on a weekday" do
     dates = %w{2012-7-9 2012-8-13 2012-9-10}
     schedule = Schedule.infer(dates)
     assert_equal "The second Monday of every month", schedule.humanize
   end
   
-  test "should infer monthly recurrence from something that occurs three months in a row on the second Monday AND the fourth Monday of the month" do
+  test "should infer a schedule that occurs several times a month" do
     dates = %w{2012-7-9 2012-7-23 2012-8-13 2012-8-27 2012-9-10 2012-9-24}
     schedule = Schedule.infer(dates)
     assert_equal "The second Monday and fourth Monday of every month", schedule.humanize
@@ -97,7 +97,7 @@ class InferrableTest < ActiveSupport::TestCase
   
   # ... with skips
   
-  test "should infer monthly recurrence for something that occurs every other month" do
+  test "should infer a schedule that occurs every third month" do
     dates = %w{2012-2-4 2012-5-4 2012-8-4}
     schedule = Schedule.infer(dates)
     assert_equal "The 4th of every third month", schedule.humanize
@@ -106,15 +106,15 @@ class InferrableTest < ActiveSupport::TestCase
   
   
   
-  # Infers weekly patterns
+  # Infers weekly schedules
   
-  test "should infer weekly recurrence from something that occurs three weeks in a row on the same day" do
+  test "should infer a weekly schedule" do
     dates = %w{2012-3-4 2012-3-11 2012-3-18}
     schedule = Schedule.infer(dates)
     assert_equal "Every Sunday", schedule.humanize
   end
   
-  test "should infer weekly recurrence from something that occurs several time a week three weeks in a row" do
+  test "should infer a schedule that occurs several times a week" do
     dates = %w{2012-3-6 2012-3-8 2012-3-13 2012-3-15 2012-3-20 2012-3-22}
     schedule = Schedule.infer(dates)
     assert_equal "Every Tuesday and Thursday", schedule.humanize
@@ -132,13 +132,13 @@ class InferrableTest < ActiveSupport::TestCase
   
   # ... when some dates are missing from the input array
   
-  test "should infer weekly recurrence from something that occurs once a week, with a missing date" do
+  test "should infer a weekly schedule (missing dates)" do
     dates = %w{2012-3-4 2012-3-11 2012-3-25}
     schedule = Schedule.infer(dates)
     assert_equal "Every Sunday", schedule.humanize
   end
   
-  test "should infer weekly recurrence from something that occurs several time a week, with missing dates" do
+  test "should infer a schedule that occurs several times a week (missing dates)" do
     dates = %w{2012-3-6 2012-3-8 2012-3-15 2012-3-20 2012-3-27 2012-3-29}
     schedule = Schedule.infer(dates)
     assert_equal "Every Tuesday and Thursday", schedule.humanize
