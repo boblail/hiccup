@@ -10,10 +10,12 @@ module Hiccup
       
       
       
-      def infer(dates)
+      def infer(dates, options={})
+        @verbose = options.fetch(:verbose, false)
         dates = extract_array_of_dates!(dates)
         guesses = generate_guesses(dates)
-        pick_best_guess(guesses, dates)
+        guess, score = pick_best_guess(guesses, dates)
+        guess
       end
       
       
@@ -70,33 +72,50 @@ module Hiccup
       
       
       def pick_best_guess(guesses, dates)
-        top_score = 0
-        best_guess = nil
-        guesses.each do |guess|
-          score = score_guess(guess, dates)
-          if score > top_score
-            top_score = score
-            best_guess = guess
+        scored_guesses = guesses \
+          .map { |guess| [guess, score_guess(guess, dates)] } \
+          .sort_by { |(guess, score)| -score.to_f }
+        
+        if @verbose
+          puts "\nGUESSES FOR #{dates}:"
+          scored_guesses.each do |(guess, score)|
+            puts "  (%.3f p/%.3f b/%.3f c/%.3f) #{guess.humanize}" % [
+              score.to_f,
+              score.prediction_rate,
+              score.brick_penalty,
+              score.complexity_penalty]
           end
+          puts ""
         end
-        best_guess
+        
+        scored_guesses.reject { |(guess, score)| score.to_f < 0.500 }.first
       end
       
       def score_guess(guess, input_dates)
         predicted_dates = guess.occurrences_between(guess.start_date, guess.end_date)
         
-        # Failures are input dates that were not predicted by this guess
-        failure_count = (input_dates - predicted_dates).length
+        # prediction_rate is the percent of input dates predicted
+        predictions = (predicted_dates & input_dates).length
+        prediction_rate = Float(predictions) / Float(input_dates.length)
         
-        # Bricks are dates that _were_ predicted by this guess but are not in the input
-        brick_count = (predicted_dates - input_dates).length
+        # bricks are dates predicted by this guess but not in the input
+        bricks = (predicted_dates - input_dates).length
         
-        pattern_complexity = 1
-        pattern_complexity = guess.weekly_pattern.length if guess.weekly?
-        pattern_complexity = guess.monthly_pattern.length if guess.monthly?
+        # brick_rate is the percent of bricks to predictions
+        # A brick_rate >= 1 means that this guess bricks more than it predicts
+        brick_rate = Float(bricks) / Float(input_dates.length)
         
-        # Failures are more serious than bricks
-        1000 - ((failure_count * 2.0) + brick_count + (pattern_complexity * 0.75))
+        # complexity measures how many rules are necesary
+        # to describe the pattern
+        complexity = complexity_of(guess)
+        
+        Score.new(prediction_rate, brick_rate, complexity)
+      end
+      
+      def complexity_of(schedule)
+        return schedule.weekly_pattern.length if schedule.weekly?
+        return schedule.monthly_pattern.length if schedule.monthly?
+        1
       end
       
       
@@ -115,6 +134,37 @@ module Hiccup
         raise ArgumentError.new("Inferrable.infer expects to receive a collection of dates")
       end
       
+      
+      
+      class Score < Struct.new(:prediction_rate, :brick_rate, :complexity)
+        
+        # as brick rate rises, our confidence in this guess drops
+        def brick_penalty
+          brick_penalty = brick_rate * 0.33
+          brick_penalty = 1 if brick_penalty > 1
+          brick_penalty
+        end
+        
+        # as the complexity rises, our confidence in this guess drops
+        # this hash table is a stand-in for a proper formala
+        def complexity_penalty
+          {1 => 0, 2 => 0.10, 3 => 0.25, 4 => 0.45, 5 => 0.70}.fetch(complexity, 0.90)
+        end
+        
+        # our confidence is weakened by bricks and complexity
+        def confidence
+          confidence = 1.0
+          confidence *= (1 - brick_penalty)
+          confidence *= (1 - complexity_penalty)
+          confidence
+        end
+        
+        # a number between 0 and 1
+        def to_f
+          prediction_rate * confidence
+        end
+        
+      end
       
       
     end

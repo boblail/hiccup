@@ -146,4 +146,18 @@ class InferrableTest < ActiveSupport::TestCase
   
   
   
+  
+  # Correctly identifies scenarios where there is no pattern
+  
+  test "should not try to guess a pattern for input where there is none" do
+    arbitrary_date_ranges = [
+      %w{2013-1-1 2013-3-30 2014-8-19}
+    ]
+    
+    arbitrary_date_ranges.each do |dates|
+      schedule = Schedule.infer(dates)
+      fail "There should be no pattern to the dates #{dates}, but Hiccup guessed \"#{schedule.humanize}\"" if schedule
+    end
+  end
+  
 end
