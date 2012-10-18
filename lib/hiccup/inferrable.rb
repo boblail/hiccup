@@ -24,7 +24,17 @@ module Hiccup
         start_date = dates.min
         end_date = dates.max
         guesses = []
+        histogram_of_wdays = dates.each_with_object(Hash.new { 0 }) { |date, histogram| histogram[date.wday] += 1  }
+        wdays_by_popularity = histogram_of_wdays.each_with_object({}) { |(wday, popularity), by_popularity| (by_popularity[popularity]||=[]).push(wday) }
+        wday_popularities = wdays_by_popularity.keys.sort.reverse
         
+        if @verbose
+          puts "",
+               "  input: #{dates.inspect}",
+               "  histogram: #{histogram_of_wdays.inspect}",
+               "  by_popularity: #{wdays_by_popularity.inspect}",
+               "  wday_popularities: #{wday_popularities.inspect}"
+        end
         
         (1...5).each do |skip|
           guesses << self.new.tap do |schedule|
@@ -56,13 +66,17 @@ module Hiccup
         end
         
         (1...5).each do |skip|
-          guesses << self.new.tap do |schedule|
-            schedule.kind = :weekly
-            schedule.start_date = start_date
-            schedule.end_date = end_date
-            schedule.skip = skip
-            # schedule.weekly_pattern = histogram_of_wdays.keys.map { |wday| Date::DAYNAMES[wday] }
-            schedule.weekly_pattern = dates.map(&:wday).uniq.map { |wday| Date::DAYNAMES[wday] }
+          wday_popularities.length.times do |i|
+            at_popularities = wday_popularities.take(i + 1)
+            wdays = wdays_by_popularity.values_at(*at_popularities).flatten
+            
+            guesses << self.new.tap do |schedule|
+              schedule.kind = :weekly
+              schedule.start_date = start_date
+              schedule.end_date = end_date
+              schedule.skip = skip
+              schedule.weekly_pattern = wdays.map { |wday| Date::DAYNAMES[wday] }
+            end
           end
         end
         

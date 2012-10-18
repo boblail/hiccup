@@ -145,6 +145,21 @@ class InferrableTest < ActiveSupport::TestCase
   end
   
   
+  # ... when some dates are wrong in the input group
+  
+  test "should infer a weekly schedule when one day was rescheduled" do
+    dates = %w{2012-10-02 2012-10-09 2012-10-15} # a Tuesday, a Tuesday, and a Monday
+    schedule = Schedule.infer(dates)
+    assert_equal "Every Tuesday", schedule.humanize
+  end
+  
+  test "should infer a weekly schedule when the first day was rescheduled" do
+    dates = %w{2012-10-07 2012-10-10 2012-10-17} # a Sunday, a Wednesday, and a Wednesday
+    schedule = Schedule.infer(dates)
+    assert_equal "Every Wednesday", schedule.humanize
+  end
+  
+  
   
   
   # Correctly identifies scenarios where there is no pattern
