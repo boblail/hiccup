@@ -69,7 +69,7 @@ module Hiccup
       
       def generate_weekly_guesses(dates)
         [].tap do |guesses|
-          histogram_of_wdays = dates.each_with_object(Hash.new { 0 }) { |date, histogram| histogram[date.wday] += 1  }
+          histogram_of_wdays = dates.each_with_object(Hash.new { 0 }) { |date, histogram| histogram[Date::DAYNAMES[date.wday]] += 1  }
           wdays_by_popularity = histogram_of_wdays.each_with_object({}) { |(wday, popularity), by_popularity| (by_popularity[popularity]||=[]).push(wday) }
           wday_popularities = wdays_by_popularity.keys.sort.reverse
         
@@ -91,7 +91,7 @@ module Hiccup
                 schedule.start_date = @start_date
                 schedule.end_date = @end_date
                 schedule.skip = skip
-                schedule.weekly_pattern = wdays.map { |wday| Date::DAYNAMES[wday] }
+                schedule.weekly_pattern = wdays
               end
             end
           end
