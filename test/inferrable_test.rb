@@ -51,6 +51,7 @@ class InferrableTest < ActiveSupport::TestCase
   
   
   
+  
   # Infers annual schedules
   
   test "should infer an annual" do
@@ -67,6 +68,8 @@ class InferrableTest < ActiveSupport::TestCase
     schedule = Schedule.infer(dates)
     assert_equal "Every other year on March 4", schedule.humanize
   end
+  
+  
   
   
   
@@ -102,6 +105,28 @@ class InferrableTest < ActiveSupport::TestCase
     schedule = Schedule.infer(dates)
     assert_equal "The 4th of every third month", schedule.humanize
   end
+  
+  
+  # ... when some dates are wrong in the input group
+  
+  test "should infer a monthly schedule when one day was rescheduled" do
+    dates = %w{2012-10-02 2012-11-06 2012-12-05} # 1st Tuesday, 1st Tuesday, 1st Wednesday
+    schedule = Schedule.infer(dates)
+    assert_equal "The first Tuesday of every month", schedule.humanize
+  end
+  
+  test "should infer a monthly schedule when the first day was rescheduled" do
+    dates = %w{2012-10-03 2012-11-01 2012-12-06} # 1st Wednesday, 1st Thursday, 1st Thursday
+    schedule = Schedule.infer(dates)
+    assert_equal "The first Thursday of every month", schedule.humanize
+  end
+  
+  test "should infer a monthly schedule when the first day was rescheduled 2" do
+    dates = %w{2012-10-11 2012-11-01 2012-12-06} # 2nd Thursday, 1st Thursday, 1st Thursday
+    schedule = Schedule.infer(dates)
+    assert_equal "The first Thursday of every month", schedule.humanize
+  end
+  
   
   
   

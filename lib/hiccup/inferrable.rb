@@ -44,6 +44,22 @@ module Hiccup
       end
       
       def generate_monthly_guesses(dates)
+        histogram_of_patterns = dates.each_with_object(Hash.new { 0 }) do |date, histogram|
+          pattern = [date.get_nth_wday_of_month, Date::DAYNAMES[date.wday]]
+          histogram[pattern] += 1
+        end
+        patterns_by_popularity = histogram_of_patterns.each_with_object({}) { |(pattern, popularity), by_popularity| (by_popularity[popularity]||=[]).push(pattern) }
+        pattern_popularities = patterns_by_popularity.keys.sort.reverse
+              
+        if @verbose
+          puts "",
+               "  monthly analysis:",
+               "    input: #{dates.inspect}",
+               "    histogram: #{histogram_of_patterns.inspect}",
+               "    by_popularity: #{patterns_by_popularity.inspect}",
+               "    popularities: #{pattern_popularities.inspect}"
+        end
+        
         [].tap do |guesses|
           (1...5).each do |skip|
             guesses << self.new.tap do |schedule|
@@ -54,14 +70,20 @@ module Hiccup
               schedule.monthly_pattern = [@start_date.day]
             end
             
-            guesses << self.new.tap do |schedule|
-              schedule.kind = :monthly
-              schedule.start_date = @start_date
-              schedule.end_date = @end_date
-              schedule.skip = skip
-              schedule.monthly_pattern = dates.map { |date|
-                [date.get_nth_wday_of_month, Date::DAYNAMES[date.wday]]
-              }.uniq
+            pattern_popularities.length.times do |i|
+              at_popularities = pattern_popularities.take(i + 1)
+              patterns = patterns_by_popularity \
+                .values_at(*at_popularities) \
+                .flatten \
+                .in_groups_of(2)
+              
+              guesses << self.new.tap do |schedule|
+                schedule.kind = :monthly
+                schedule.start_date = @start_date
+                schedule.end_date = @end_date
+                schedule.skip = skip
+                schedule.monthly_pattern = patterns
+              end
             end
           end
         end
@@ -75,10 +97,11 @@ module Hiccup
         
           if @verbose
             puts "",
-                 "  input: #{dates.inspect}",
-                 "  histogram: #{histogram_of_wdays.inspect}",
-                 "  by_popularity: #{wdays_by_popularity.inspect}",
-                 "  wday_popularities: #{wday_popularities.inspect}"
+                 "  weekly analysis:",
+                 "    input: #{dates.inspect}",
+                 "    histogram: #{histogram_of_wdays.inspect}",
+                 "    by_popularity: #{wdays_by_popularity.inspect}",
+                 "    popularities: #{wday_popularities.inspect}"
           end
           
           (1...5).each do |skip|
