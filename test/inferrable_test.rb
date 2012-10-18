@@ -151,7 +151,8 @@ class InferrableTest < ActiveSupport::TestCase
   
   test "should not try to guess a pattern for input where there is none" do
     arbitrary_date_ranges = [
-      %w{2013-1-1 2013-3-30 2014-8-19}
+      %w{2013-01-01 2013-03-30 2014-08-19},
+      %w{2012-10-01 2012-10-09 2012-10-17}, # a Monday, a Tuesday, and a Wednesday
     ]
     
     arbitrary_date_ranges.each do |dates|

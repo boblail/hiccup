@@ -88,7 +88,7 @@ module Hiccup
           puts ""
         end
         
-        scored_guesses.reject { |(guess, score)| score.to_f < 0.500 }.first
+        scored_guesses.reject { |(guess, score)| score.to_f < 0.333 }.first
       end
       
       def score_guess(guess, input_dates)
@@ -109,7 +109,10 @@ module Hiccup
         # to describe the pattern
         complexity = complexity_of(guess)
         
-        Score.new(prediction_rate, brick_rate, complexity)
+        # complexity_rate is the number of rules per inputs
+        complexity_rate = Float(complexity) / Float(input_dates.length)
+        
+        Score.new(prediction_rate, brick_rate, complexity_rate)
       end
       
       def complexity_of(schedule)
@@ -136,7 +139,7 @@ module Hiccup
       
       
       
-      class Score < Struct.new(:prediction_rate, :brick_rate, :complexity)
+      class Score < Struct.new(:prediction_rate, :brick_rate, :complexity_rate)
         
         # as brick rate rises, our confidence in this guess drops
         def brick_penalty
@@ -147,8 +150,11 @@ module Hiccup
         
         # as the complexity rises, our confidence in this guess drops
         # this hash table is a stand-in for a proper formala
+        #
+        # A complexity of 1 means that 1 rule is required per input
+        # date. This means we haven't really discovered a pattern.
         def complexity_penalty
-          {1 => 0, 2 => 0.10, 3 => 0.25, 4 => 0.45, 5 => 0.70}.fetch(complexity, 0.90)
+          complexity_rate
         end
         
         # our confidence is weakened by bricks and complexity
