@@ -201,4 +201,11 @@ class InferrableTest < ActiveSupport::TestCase
     end
   end
   
+  
+  
+  test "should diabolically complex schedules" do
+    dates = %w{2012-11-06 2012-11-08 2012-11-15 2012-11-20 2012-11-27 2012-11-29 2013-02-05 2013-02-14 2013-02-21 2013-02-19 2013-02-26 2013-05-07 2013-05-09 2013-05-16 2013-05-28 2013-05-21 2013-05-30}
+    schedule = Schedule.infer(dates)
+    assert_equal "The first Tuesday, second Thursday, third Thursday, third Tuesday, fourth Tuesday, and fifth Thursday of every third month", schedule.humanize
+  end
 end
