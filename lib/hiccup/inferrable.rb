@@ -143,7 +143,8 @@ module Hiccup
           puts ""
         end
         
-        scored_guesses.reject { |(guess, score)| score.to_f < 0.333 }.first
+        best_guess = scored_guesses.reject { |(guess, score)| score.to_f < 0.333 }.first
+        best_guess || Schedule.new(kind: :never)
       end
       
       def score_guess(guess, input_dates)

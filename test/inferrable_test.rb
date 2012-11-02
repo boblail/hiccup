@@ -197,7 +197,7 @@ class InferrableTest < ActiveSupport::TestCase
     
     arbitrary_date_ranges.each do |dates|
       schedule = Schedule.infer(dates)
-      fail "There should be no pattern to the dates #{dates}, but Hiccup guessed \"#{schedule.humanize}\"" if schedule
+      fail "There should be no pattern to the dates #{dates}, but Hiccup guessed \"#{schedule.humanize}\"" unless schedule.never?
     end
   end
   
