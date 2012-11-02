@@ -1,5 +1,7 @@
 require 'active_support/concern'
 require 'active_support/core_ext/date/conversions'
+require 'hiccup/core_ext/enumerable'
+require 'hiccup/core_ext/hash'
 
 
 module Hiccup
@@ -44,20 +46,17 @@ module Hiccup
       end
       
       def generate_monthly_guesses(dates)
-        histogram_of_patterns = dates.each_with_object(Hash.new { 0 }) do |date, histogram|
-          pattern = [date.get_nth_wday_of_month, Date::DAYNAMES[date.wday]]
-          histogram[pattern] += 1
+        histogram_of_patterns = dates.to_histogram do |date|
+          [date.get_nth_wday_of_month, Date::DAYNAMES[date.wday]]
         end
-        patterns_by_popularity = histogram_of_patterns.each_with_object({}) { |(pattern, popularity), by_popularity| (by_popularity[popularity]||=[]).push(pattern) }
-        pattern_popularities = patterns_by_popularity.keys.sort.reverse
+        patterns_by_popularity = histogram_of_patterns.flip
               
         if @verbose
           puts "",
                "  monthly analysis:",
                "    input: #{dates.inspect}",
                "    histogram: #{histogram_of_patterns.inspect}",
-               "    by_popularity: #{patterns_by_popularity.inspect}",
-               "    popularities: #{pattern_popularities.inspect}"
+               "    by_popularity: #{patterns_by_popularity.inspect}"
         end
         
         [].tap do |guesses|
@@ -70,13 +69,7 @@ module Hiccup
               schedule.monthly_pattern = [@start_date.day]
             end
             
-            pattern_popularities.length.times do |i|
-              at_popularities = pattern_popularities.take(i + 1)
-              patterns = patterns_by_popularity \
-                .values_at(*at_popularities) \
-                .flatten \
-                .in_groups_of(2)
-              
+            enumerate_by_popularity(patterns_by_popularity) do |patterns|
               guesses << self.new.tap do |schedule|
                 schedule.kind = :monthly
                 schedule.start_date = @start_date
@@ -91,24 +84,21 @@ module Hiccup
       
       def generate_weekly_guesses(dates)
         [].tap do |guesses|
-          histogram_of_wdays = dates.each_with_object(Hash.new { 0 }) { |date, histogram| histogram[Date::DAYNAMES[date.wday]] += 1  }
-          wdays_by_popularity = histogram_of_wdays.each_with_object({}) { |(wday, popularity), by_popularity| (by_popularity[popularity]||=[]).push(wday) }
-          wday_popularities = wdays_by_popularity.keys.sort.reverse
-        
+          histogram_of_wdays = dates.to_histogram do |date|
+            Date::DAYNAMES[date.wday]
+          end
+          wdays_by_popularity = histogram_of_wdays.flip
+          
           if @verbose
             puts "",
                  "  weekly analysis:",
                  "    input: #{dates.inspect}",
                  "    histogram: #{histogram_of_wdays.inspect}",
-                 "    by_popularity: #{wdays_by_popularity.inspect}",
-                 "    popularities: #{wday_popularities.inspect}"
+                 "    by_popularity: #{wdays_by_popularity.inspect}"
           end
           
           (1...5).each do |skip|
-            wday_popularities.length.times do |i|
-              at_popularities = wday_popularities.take(i + 1)
-              wdays = wdays_by_popularity.values_at(*at_popularities).flatten
-              
+            enumerate_by_popularity(wdays_by_popularity) do |wdays|
               guesses << self.new.tap do |schedule|
                 schedule.kind = :weekly
                 schedule.start_date = @start_date
@@ -118,6 +108,19 @@ module Hiccup
               end
             end
           end
+        end
+      end
+      
+      
+      
+      # Expects a hash of values grouped by popularity
+      # Yields the most popular values first, and then
+      # increasingly less popular values
+      def enumerate_by_popularity(values_by_popularity)
+        popularities = values_by_popularity.keys.sort.reverse
+        popularities.length.times do |i|
+          at_popularities = popularities.take(i + 1)
+          yield values_by_popularity.values_at(*at_popularities).flatten(1)
         end
       end
       
