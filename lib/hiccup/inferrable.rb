@@ -58,23 +58,30 @@ module Hiccup
           [date.get_nth_wday_of_month, Date::DAYNAMES[date.wday]]
         end
         patterns_by_popularity = histogram_of_patterns.flip
-              
+        
+        histogram_of_days = dates.to_histogram(&:day)
+        days_by_popularity = histogram_of_days.flip
+        
         if @verbose
           puts "",
                "  monthly analysis:",
                "    input: #{dates.inspect}",
-               "    histogram: #{histogram_of_patterns.inspect}",
-               "    by_popularity: #{patterns_by_popularity.inspect}"
+               "    histogram (weekday): #{histogram_of_patterns.inspect}",
+               "    by_popularity (weekday): #{patterns_by_popularity.inspect}",
+               "    histogram (day): #{histogram_of_days.inspect}",
+               "    by_popularity (day): #{days_by_popularity.inspect}"
         end
         
         [].tap do |guesses|
           (1...5).each do |skip|
-            guesses << self.new.tap do |schedule|
-              schedule.kind = :monthly
-              schedule.start_date = @start_date
-              schedule.end_date = @end_date
-              schedule.skip = skip
-              schedule.monthly_pattern = [@start_date.day]
+            enumerate_by_popularity(days_by_popularity) do |days|
+              guesses << self.new.tap do |schedule|
+                schedule.kind = :monthly
+                schedule.start_date = @start_date
+                schedule.end_date = @end_date
+                schedule.skip = skip
+                schedule.monthly_pattern = days
+              end
             end
             
             enumerate_by_popularity(patterns_by_popularity) do |patterns|
