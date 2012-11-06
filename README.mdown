@@ -12,6 +12,7 @@ Hiccup does provide an extremely lightweight `Schedule` class that mixes in all 
       hiccup :enumerable,
              :validatable,
              :humanizable,
+             :inferrable,
              :serializable => [:ical]
       
     end
@@ -55,6 +56,23 @@ Mixes in ActiveModel validations for recurrence models
 ### Humanizable
 
 Represents a recurring pattern in a human-readable string
+
+### Inferrable
+
+Infers a schedule from an array of dates
+
+Examples:
+
+```ruby
+schedule = Schedule.infer %w{2012-7-9 2012-8-13 2012-9-10}
+schedule.humanize # => "The second Monday of every month"
+
+schedule = Schedule.infer %w{2010-3-4 2011-3-4 2012-3-4}
+schedule.humanize # => "Every year on March 4"
+
+schedule = Schedule.infer %w{2012-3-6 2012-3-8 2012-3-15 2012-3-20 2012-3-27 2012-3-29}
+schedule.humanize # => "Every Tuesday and Thursday"
+```
 
 ### Serializable
 
