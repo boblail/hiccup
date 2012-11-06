@@ -33,11 +33,19 @@ module Hiccup
       end
       
       def generate_yearly_guesses(dates)
+        histogram_of_patterns = dates.to_histogram do |date|
+          [date.month, date.day]
+        end
+        patterns_by_popularity = histogram_of_patterns.flip # => {1 => [...], 2 => [...], 5 => [a, b]}
+        highest_popularity = patterns_by_popularity.keys.max # => 5
+        most_popular = patterns_by_popularity[highest_popularity].first # => a
+        start_date = Date.new(@start_date.year, *most_popular)
+
         [].tap do |guesses|
           (1...5).each do |skip|
             guesses << self.new.tap do |schedule|
               schedule.kind = :annually
-              schedule.start_date = @start_date
+              schedule.start_date = start_date
               schedule.end_date = @end_date
               schedule.skip = skip
             end

@@ -69,6 +69,20 @@ class InferrableTest < ActiveSupport::TestCase
     assert_equal "Every other year on March 4", schedule.humanize
   end
   
+  # ... where some of the input is wrong
+  
+  test "should infer a yearly schedule when one of the dates was rescheduled" do
+    dates = %w{2010-3-4 2011-9-15 2012-3-4 2013-3-4}
+    schedule = Schedule.infer(dates)
+    assert_equal "Every year on March 4", schedule.humanize
+  end
+  
+  test "should infer a yearly schedule when the first date was rescheduled" do
+    dates = %w{2010-3-6 2011-3-4 2012-3-4 2013-3-4}
+    schedule = Schedule.infer(dates)
+    assert_equal "Every year on March 4", schedule.humanize
+  end
+  
   
   
   
