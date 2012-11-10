@@ -3,6 +3,7 @@ require "test_helper"
 
 class EnumerableTest < ActiveSupport::TestCase
   include Hiccup
+  PERFORMANCE_TEST = false
   
   
   
@@ -307,38 +308,68 @@ class EnumerableTest < ActiveSupport::TestCase
   
   
   
-  test "performance test" do
-    n = 100
-    
-    Benchmark.bm do |x|
-      x.report("weekly:") do
-        n.times do 
-          Schedule.new(
-            :kind => :weekly,
-            :weekly_pattern => ["Friday"],
-            :start_date => Date.new(2009, 1, 1)) \
-            .occurrences_between(Date.new(2009, 1, 1), Date.new(2009, 12, 31))
+  if PERFORMANCE_TEST
+    test "performance test" do
+      n = 100
+      
+      # Each of these schedules should describe 52 events
+      
+      Benchmark.bm(20) do |x|
+        x.report("weekly (simple):") do
+          n.times do 
+            Schedule.new(
+              :kind => :weekly,
+              :weekly_pattern => ["Friday"],
+              :start_date => Date.new(2009, 1, 1)) \
+              .occurrences_between(Date.new(2009, 1, 1), Date.new(2009, 12, 31))
+          end
+        end
+        x.report("weekly (complex):") do
+          n.times do 
+            Schedule.new(
+              :kind => :weekly,
+              :weekly_pattern => ["Monday", "Wednesday", "Friday"],
+              :start_date => Date.new(2009, 1, 1)) \
+              .occurrences_between(Date.new(2009, 1, 1), Date.new(2009, 5, 2))
+          end
+        end
+        x.report("monthly (simple):") do
+          n.times do
+            Schedule.new(
+              :kind => :monthly,
+              :monthly_pattern => [[2, "Monday"]],
+              :start_date => Date.new(2009, 1, 1)) \
+              .occurrences_between(Date.new(2009, 1, 1), Date.new(2013, 4, 30))
+          end
+        end
+        x.report("monthly (complex):") do
+          n.times do
+            Schedule.new(
+              :kind => :monthly,
+              :monthly_pattern => [[2, "Monday"], [4, "Monday"]],
+              :start_date => Date.new(2009, 1, 1)) \
+              .occurrences_between(Date.new(2009, 1, 1), Date.new(2011, 3, 1))
+          end
+        end
+        x.report("yearly:") do
+          n.times do
+            Schedule.new(
+              :kind => :annually,
+              :start_date => Date.new(1960, 3, 15)) \
+              .occurrences_between(Date.new(1960, 1, 1), Date.new(2011, 12, 31))
+          end
+        end
+        x.report("yearly (2/29):") do
+          n.times do
+            Schedule.new(
+              :kind => :annually,
+              :start_date => Date.new(1960, 2, 29)) \
+              .occurrences_between(Date.new(1960, 1, 1), Date.new(2011, 12, 31))
+          end
         end
       end
-      x.report("monthly:") do
-        n.times do
-          Schedule.new(
-            :kind => :monthly,
-            :monthly_pattern => [[2, "Monday"]],
-            :start_date => Date.new(2009, 1, 1)) \
-            .occurrences_between(Date.new(2009, 1, 1), Date.new(2013, 4, 30))
-        end
-      end
-      x.report("yearly:") do
-        n.times do
-          Schedule.new(
-            :kind => :annually,
-            :start_date => Date.new(1960, 3, 15)) \
-            .occurrences_between(Date.new(1960, 1, 1), Date.new(2011, 12, 31))
-        end
-      end
+      
     end
-  
   end
   
   

@@ -5,6 +5,24 @@ module Hiccup
     class WeeklyEnumerator < ScheduleEnumerator
       
       
+      def initialize(*args)
+        super
+        
+        # Use more efficient iterator methods if
+        # weekly_pattern is simple enough
+        
+        if weekly_pattern.length == 1
+          def self.next_occurrence_after(date)
+            date + skip * 7
+          end
+          
+          def self.next_occurrence_before(date)
+            date - skip * 7
+          end
+        end
+      end
+      
+      
       def first_occurrence_on_or_after(date)        
         result = nil
         wday = date.wday

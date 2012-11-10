@@ -5,6 +5,24 @@ module Hiccup
     class AnnuallyEnumerator < ScheduleEnumerator
       
       
+      def initialize(*args)
+        super
+        
+        # Use more efficient iterator methods unless
+        # we have to care about leap years
+        
+        unless start_date.month == 2 && start_date.day == 29
+          def self.next_occurrence_after(date)
+            date.next_year(skip)
+          end
+          
+          def self.next_occurrence_before(date)
+            date.prev_year(skip)
+          end
+        end
+      end
+      
+      
       def first_occurrence_on_or_after(date)
         year, month, day = date.year, start_date.month, start_date.day
         day = -1 if month == 2 && day == 29
