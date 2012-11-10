@@ -2,6 +2,7 @@ require 'active_support/concern'
 require 'active_support/core_ext/date/conversions'
 require 'hiccup/core_ext/enumerable'
 require 'hiccup/core_ext/hash'
+require "hiccup/core_ext/date"
 
 
 module Hiccup

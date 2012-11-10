@@ -18,6 +18,18 @@ class EnumerableTest < ActiveSupport::TestCase
   
   
   
+  test "annual recurrence with a skip" do
+    schedule = Schedule.new({
+      :kind => :annually,
+      :skip => 2,
+      :start_date => Date.new(2009,3,4)})
+    expected_dates = %w{2009-03-04 2011-03-04 2013-03-04}
+    actual_dates = schedule.occurrences_between(Date.new(2009, 01, 01), Date.new(2013, 12, 31)).map(&:to_s)
+    assert_equal expected_dates, actual_dates
+  end
+  
+  
+  
   def test_occurs_on_weekly
     schedule = Schedule.new({
       :kind => :weekly,
@@ -277,6 +289,7 @@ class EnumerableTest < ActiveSupport::TestCase
     });
     
     assert_equal [Date.new(2010, 2, 28)], schedule.occurrences_during_month(2010, 2)
+    assert_equal [Date.new(2012, 2, 29)], schedule.occurrences_during_month(2012, 2)
   end
   
   
@@ -286,7 +299,7 @@ class EnumerableTest < ActiveSupport::TestCase
       :kind => :monthly,
       :monthly_pattern => [31],
       :start_date => Date.new(2008, 2, 29)
-    });
+    })
     
     assert_equal [Date.new(2010, 1, 31)], schedule.occurrences_during_month(2010, 1)
     assert_equal [], schedule.occurrences_during_month(2010, 2)
@@ -294,38 +307,39 @@ class EnumerableTest < ActiveSupport::TestCase
   
   
   
-  # def test_monthly_occurrence_to_date
-  #   occurrence = MonthlyOccurrence.new(:ordinal => 3, :kind => "Thursday")
-  #   assert_equal 21, occurrence.to_date(2009, 5).day,   "The third Thursday in May 2009 should be the 21st"
-  #   assert_equal 16, occurrence.to_date(2009, 4).day,   "The third Thursday in April 2009 should be the 16th"
-  #   assert_equal 15, occurrence.to_date(2012, 11).day,  "The third Thursday in November 2012 should be the 15th"
-  #   
-  #   occurrence = MonthlyOccurrence.new(:ordinal => 1, :kind => "Tuesday")
-  #   assert_equal 5, occurrence.to_date(2009, 5).day,    "The first Tuesday in May 2009 should be the 5th"
-  #   assert_equal 2, occurrence.to_date(2008, 12).day,   "The first Tuesday in December 2008 should be the 2nd"
-  #   assert_equal 1, occurrence.to_date(2009, 9).day,    "The first Tuesday in September 2009 should be the 1st"
-  #   
-  #   occurrence = MonthlyOccurrence.new(:ordinal => 1, :kind => "Sunday")
-  #   assert_equal 3, occurrence.to_date(2009, 5).day,    "The first Sunday in May 2009 should be the 3rd"
-  #   assert_equal 1, occurrence.to_date(2010, 8).day,    "The first Sunday in August 2010 should be the 1st"
-  #   assert_equal 7, occurrence.to_date(2009, 6).day,    "The first Sunday in June 2009 should be the 7th"
-  #   
-  #   occurrence = MonthlyOccurrence.new(:ordinal => 1, :kind => "day")
-  #   assert_equal 1, occurrence.to_date(2009, 5).day,    "The first of May 2009 should be 1"
-  #   
-  #   occurrence = MonthlyOccurrence.new(:ordinal => 22, :kind => "day")
-  #   assert_equal 22, occurrence.to_date(2009, 5).day,   "The twenty-second of May 2009 should be 22"
-  #   
-  #   #occurrence = MonthlyOccurrence.new(:ordinal => -1, :kind => "Sunday")
-  #   #assert_equal 31, occurrence.to_date(2009, 5),       "The last Sunday in May 2009 should be the 31st"
-  # end
-  #
-  #
-  # test "to_date should return nil if there is no occurrence with the specified parameters" do
-  #   mo = MonthlyOccurrence.new(:ordinal => 5, :kind => "Monday")
-  #   assert_equal "fifth Monday", mo.to_s
-  #   assert_nil mo.to_date(2010, 6)
-  # end
+  test "performance test" do
+    n = 100
+    
+    Benchmark.bm do |x|
+      x.report("weekly:") do
+        n.times do 
+          Schedule.new(
+            :kind => :weekly,
+            :weekly_pattern => ["Friday"],
+            :start_date => Date.new(2009, 1, 1)) \
+            .occurrences_between(Date.new(2009, 1, 1), Date.new(2009, 12, 31))
+        end
+      end
+      x.report("monthly:") do
+        n.times do
+          Schedule.new(
+            :kind => :monthly,
+            :monthly_pattern => [[2, "Monday"]],
+            :start_date => Date.new(2009, 1, 1)) \
+            .occurrences_between(Date.new(2009, 1, 1), Date.new(2013, 4, 30))
+        end
+      end
+      x.report("yearly:") do
+        n.times do
+          Schedule.new(
+            :kind => :annually,
+            :start_date => Date.new(1960, 3, 15)) \
+            .occurrences_between(Date.new(1960, 1, 1), Date.new(2011, 12, 31))
+        end
+      end
+    end
+  
+  end
   
   
   

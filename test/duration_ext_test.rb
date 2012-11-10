@@ -1,4 +1,5 @@
 require "test_helper"
+require "hiccup/core_ext/duration"
 
 
 class DurationExtTest < ActiveSupport::TestCase
