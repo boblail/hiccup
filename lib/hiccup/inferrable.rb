@@ -11,21 +11,129 @@ module Hiccup
     
     module ClassMethods
       
-      
-      
       def infer(dates, options={})
-        @verbose = options.fetch(:verbose, false)
         dates = extract_array_of_dates!(dates)
-        guesses = generate_guesses(dates)
-        guess, score = pick_best_guess(guesses, dates)
-        guess
+        
+        enumerator = DatesEnumerator.new(dates)
+        guesser = Guesser.new(self, options)
+        confidences = []
+        confidence_threshold = 0.6
+        rewind_by = 0
+        
+        until enumerator.done?
+          date = enumerator.next
+          guesser << date
+          confidences << guesser.confidence.to_f
+          
+          if guesser.predicted?(date)
+            rewind_by = 0
+          else
+            rewind_by += 1
+          end
+          
+          # puts "date: #{date}, confidences: #{confidences}, rewind_by: #{rewind_by}" if options[:verbose]
+          
+          # if the last two confidences are both below a certain
+          # threshhold and both declining, back up to where we
+          # started to go wrong and start a new schedule.
+          
+          if confidences.length >= 3 &&
+             confidences[-1] < confidence_threshold &&
+             confidences[-2] < confidence_threshold &&
+             confidences[-1] < confidences[-2] &&
+             confidences[-2] < confidences[-3]
+            
+            rewind_by -= 1 if rewind_by == guesser.count
+            enumerator.rewind_by(rewind_by)
+            guesser.restart!
+            confidences = []
+            rewind_by = 0
+          end
+        end
+        
+        guesser.stop!
+        
+        guesser.guesses
       end
       
       
       
+      def extract_array_of_dates!(dates)
+        raise_invalid_dates_error! unless dates.respond_to?(:each)
+        dates.map { |date| assert_date!(date) }.sort
+      end
+      
+      def assert_date!(date)
+        return date if date.is_a?(Date)
+        date.to_date rescue raise_invalid_dates_error!
+      end
+      
+      def raise_invalid_dates_error!
+        raise ArgumentError.new("Inferrable.infer expects to receive a collection of dates")
+      end
+      
+      
+      
+    end
+    
+    
+    
+    class Guesser
+      
+      def initialize(klass, options={})
+        @klass = klass
+        @verbose = options.fetch(:verbose, false)
+        @guesses = []
+        start!
+      end
+      
+      attr_reader :guesses, :confidence
+      
+      def start!
+        save_current_guess!
+        reset_growing_understanding!
+      end
+      alias :restart! :start!
+      
+      def stop!
+        start!
+      end
+      
+      def save_current_guess!
+        @guesses << @schedule if @schedule
+      end
+      
+      def reset_growing_understanding!
+        @dates = []
+        @schedule = nil
+        @confidence = 0
+      end
+      
+      
+      
+      def <<(date)
+        @dates << date
+        @schedule, @confidence = best_schedule_for(@dates)
+      end
+      
+      def count
+        @dates.length
+      end
+      
+      def predicted?(date)
+        @schedule && @schedule.contains?(date)
+      end
+      
+      
+      
+      def best_schedule_for(dates)
+        guesses = generate_guesses(dates)
+        pick_best_guess(guesses, dates)
+      end
+      
       def generate_guesses(dates)
-        @start_date = dates.min
-        @end_date = dates.max
+        @start_date = dates.first
+        @end_date = dates.last
         [].tap do |guesses|
           guesses.concat generate_yearly_guesses(dates)
           guesses.concat generate_monthly_guesses(dates)
@@ -44,7 +152,7 @@ module Hiccup
 
         [].tap do |guesses|
           (1...5).each do |skip|
-            guesses << self.new.tap do |schedule|
+            guesses << @klass.new.tap do |schedule|
               schedule.kind = :annually
               schedule.start_date = start_date
               schedule.end_date = @end_date
@@ -76,7 +184,7 @@ module Hiccup
         [].tap do |guesses|
           (1...5).each do |skip|
             enumerate_by_popularity(days_by_popularity) do |days|
-              guesses << self.new.tap do |schedule|
+              guesses << @klass.new.tap do |schedule|
                 schedule.kind = :monthly
                 schedule.start_date = @start_date
                 schedule.end_date = @end_date
@@ -86,7 +194,7 @@ module Hiccup
             end
             
             enumerate_by_popularity(patterns_by_popularity) do |patterns|
-              guesses << self.new.tap do |schedule|
+              guesses << @klass.new.tap do |schedule|
                 schedule.kind = :monthly
                 schedule.start_date = @start_date
                 schedule.end_date = @end_date
@@ -115,7 +223,7 @@ module Hiccup
           
           (1...5).each do |skip|
             enumerate_by_popularity(wdays_by_popularity) do |wdays|
-              guesses << self.new.tap do |schedule|
+              guesses << @klass.new.tap do |schedule|
                 schedule.kind = :weekly
                 schedule.start_date = @start_date
                 schedule.end_date = @end_date
@@ -159,8 +267,7 @@ module Hiccup
           puts ""
         end
         
-        best_guess = scored_guesses.reject { |(guess, score)| score.to_f < 0.333 }.first
-        best_guess || Schedule.new(kind: :never)
+        scored_guesses.reject { |(guess, score)| score.to_f < 0.333 }.first
       end
       
       def score_guess(guess, input_dates)
@@ -191,22 +298,6 @@ module Hiccup
         return schedule.weekly_pattern.length if schedule.weekly?
         return schedule.monthly_pattern.length if schedule.monthly?
         1
-      end
-      
-      
-      
-      def extract_array_of_dates!(dates)
-        raise_invalid_dates_error! unless dates.respond_to?(:each)
-        dates.map { |date| assert_date!(date) }.sort
-      end
-      
-      def assert_date!(date)
-        return date if date.is_a?(Date)
-        date.to_date rescue raise_invalid_dates_error!
-      end
-      
-      def raise_invalid_dates_error!
-        raise ArgumentError.new("Inferrable.infer expects to receive a collection of dates")
       end
       
       
@@ -245,6 +336,37 @@ module Hiccup
       end
       
       
+      
     end
+    
+    
+    
+    class DatesEnumerator
+      
+      def initialize(dates)
+        @dates = dates
+        @last_index = @dates.length - 1
+        @index = -1
+      end
+      
+      def done?
+        @index == @last_index
+      end
+      
+      def next
+        @index += 1
+        raise OutOfRangeException if @index > @last_index
+        @dates[@index]
+      end
+      
+      def rewind_by(n)
+        @index -= n
+        @index = -1 if @index < -1
+      end
+      
+    end
+    
+    
+    
   end
 end
