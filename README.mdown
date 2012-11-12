@@ -13,7 +13,7 @@ class Schedule
   hiccup :enumerable,
          :validatable,
          :humanizable,
-         :inferrable,
+         :inferable,
          :serializable => [:ical]
   
 end
@@ -60,7 +60,7 @@ Mixes in ActiveModel validations for recurrence models
 
 Represents a recurring pattern in a human-readable string
 
-### Inferrable
+### Inferable
 
 Infers a schedule from an array of dates
 

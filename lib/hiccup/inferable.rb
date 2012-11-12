@@ -6,7 +6,7 @@ require "hiccup/core_ext/date"
 
 
 module Hiccup
-  module Inferrable
+  module Inferable
     extend ActiveSupport::Concern
     
     module ClassMethods
@@ -69,7 +69,7 @@ module Hiccup
       end
       
       def raise_invalid_dates_error!
-        raise ArgumentError.new("Inferrable.infer expects to receive a collection of dates")
+        raise ArgumentError.new("Inferable.infer expects to receive a collection of dates")
       end
       
       

@@ -11,7 +11,7 @@ module Hiccup
     hiccup :enumerable,
            :validatable,
            :humanizable,
-           :inferrable,
+           :inferable,
            :serializable => [:ical]
     
     

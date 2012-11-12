@@ -3,7 +3,7 @@ require "test_helper"
 # Ideas: see 3/4/10, 3/5/11, 3/4/12 as closer to
 #        a pattern than 3/4/10, 9/15/11, 3/4/12.
 
-class InferrableTest < ActiveSupport::TestCase
+class InferableTest < ActiveSupport::TestCase
   include Hiccup
   
   
