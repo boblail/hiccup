@@ -230,13 +230,20 @@ class InferableTest < ActiveSupport::TestCase
     end
   end
   
+  test "should create one non-recurring schedule for each break if asked" do
+    dates = %w{2012-03-05 2012-11-28 2012-12-05 2012-12-12} # a random Monday, then three Wednesdays
+    schedules = Schedule.infer(dates, allow_null_schedules: true)
+    
+    assert_equal ["2012-03-05", "Every Wednesday"], schedules.map(&:humanize)
+  end
+  
   
   
   test "should infer multiple schedules from mixed input" do
     dates = %w{2012-11-05 2012-11-12 2012-11-19 2012-11-28 2012-12-05 2012-12-12} # three Mondays then three Wednesdays
     schedules = Schedule.infer(dates)
-    assert_equal ["Every Monday", "Every Wednesday"],
-      schedules.map(&:humanize)
+    
+    assert_equal ["Every Monday", "Every Wednesday"], schedules.map(&:humanize)
   end
   
   

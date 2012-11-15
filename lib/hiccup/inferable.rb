@@ -12,48 +12,89 @@ module Hiccup
     module ClassMethods
       
       def infer(dates, options={})
-        dates = extract_array_of_dates!(dates)
+        allow_null_schedules = options.fetch(:allow_null_schedules, false)
+        verbosity = options.fetch(:verbosity, (options[:verbose] ? 1 : 0)) # 0, 1, or 2
         
+        dates = extract_array_of_dates!(dates)
         enumerator = DatesEnumerator.new(dates)
-        guesser = Guesser.new(self, options)
+        guesser = Guesser.new(self, {verbose: verbosity >= 2})
+        schedules = []
+        
         confidences = []
-        confidence_threshold = 0.6
-        rewind_by = 0
+        high_confidence_threshold = 0.6
+        min_confidence_threshold  = 0.35
+        
+        last_confident_schedule = nil
+        iterations_since_last_confident_schedule = 0
         
         until enumerator.done?
           date = enumerator.next
           guesser << date
-          confidences << guesser.confidence.to_f
-          
-          if guesser.predicted?(date)
-            rewind_by = 0
-          else
-            rewind_by += 1
-          end
-          
-          # puts "date: #{date}, confidences: #{confidences}, rewind_by: #{rewind_by}" if options[:verbose]
+          confidence = guesser.confidence.to_f
+          confidences << confidence
+          predicted = guesser.predicted?(date)
           
           # if the last two confidences are both below a certain
           # threshhold and both declining, back up to where we
           # started to go wrong and start a new schedule.
           
-          if confidences.length >= 3 &&
-             confidences[-1] < confidence_threshold &&
-             confidences[-2] < confidence_threshold &&
-             confidences[-1] < confidences[-2] &&
-             confidences[-2] < confidences[-3]
+          confident = !(confidences.length >= 3 && (
+                        (confidences[-1] < high_confidence_threshold &&
+                         confidences[-2] < high_confidence_threshold &&
+                         confidences[-1] < confidences[-2] &&
+                         confidences[-2] < confidences[-3]) ||
+                        (confidences[-1] < min_confidence_threshold &&
+                         confidences[-2] < min_confidence_threshold)))
+          
+          if predicted && confidence >= min_confidence_threshold
+            iterations_since_last_confident_schedule = 0
+            last_confident_schedule = guesser.schedule
+          else
+            iterations_since_last_confident_schedule += 1
+          end
+          
+          rewind_by = iterations_since_last_confident_schedule == guesser.count ? iterations_since_last_confident_schedule - 1 : iterations_since_last_confident_schedule
+          
+          
+          
+          if verbosity >= 1
+            output = "  #{enumerator.index.to_s.rjust(3)} #{date}"
+            output << " #{"[#{guesser.count}]".rjust(5)}  =>  "
+            output << "~#{(guesser.confidence.to_f * 100).to_i.to_s.rjust(2, "0")} @ "
+            output << guesser.schedule.humanize.ljust(130)
+            output << "  :( move back #{rewind_by}" unless confident
+            puts output
+          end
+          
+          
+          
+          unless confident
             
-            rewind_by -= 1 if rewind_by == guesser.count
+            if last_confident_schedule
+              schedules << last_confident_schedule
+            elsif allow_null_schedules
+              guesser.dates.take(guesser.count - rewind_by).each do |date|
+                schedules << self.new(:kind => :never, :start_date => date)
+              end
+            end
+            
             enumerator.rewind_by(rewind_by)
             guesser.restart!
             confidences = []
-            rewind_by = 0
+            iterations_since_last_confident_schedule = 0
+            last_confident_schedule = nil
           end
         end
         
-        guesser.stop!
+        if last_confident_schedule
+          schedules << last_confident_schedule
+        elsif allow_null_schedules
+          guesser.dates.each do |date|
+            schedules << self.new(:kind => :never, :start_date => date)
+          end
+        end
         
-        guesser.guesses
+        schedules
       end
       
       
@@ -83,37 +124,25 @@ module Hiccup
       def initialize(klass, options={})
         @klass = klass
         @verbose = options.fetch(:verbose, false)
-        @guesses = []
         start!
       end
       
-      attr_reader :guesses, :confidence
+      attr_reader :confidence, :schedule, :dates
       
       def start!
-        save_current_guess!
-        reset_growing_understanding!
-      end
-      alias :restart! :start!
-      
-      def stop!
-        start!
-      end
-      
-      def save_current_guess!
-        @guesses << @schedule if @schedule
-      end
-      
-      def reset_growing_understanding!
         @dates = []
         @schedule = nil
         @confidence = 0
       end
+      alias :restart! :start!
+      
       
       
       
       def <<(date)
         @dates << date
         @schedule, @confidence = best_schedule_for(@dates)
+        date
       end
       
       def count
@@ -149,7 +178,7 @@ module Hiccup
         highest_popularity = patterns_by_popularity.keys.max # => 5
         most_popular = patterns_by_popularity[highest_popularity].first # => a
         start_date = Date.new(@start_date.year, *most_popular)
-
+        
         [].tap do |guesses|
           (1...5).each do |skip|
             guesses << @klass.new.tap do |schedule|
@@ -267,7 +296,7 @@ module Hiccup
           puts ""
         end
         
-        scored_guesses.reject { |(guess, score)| score.to_f < 0.333 }.first
+        scored_guesses.first
       end
       
       def score_guess(guess, input_dates)
@@ -348,6 +377,8 @@ module Hiccup
         @last_index = @dates.length - 1
         @index = -1
       end
+      
+      attr_reader :index
       
       def done?
         @index == @last_index
