@@ -10,7 +10,7 @@ module Hiccup
     
     def humanize
       case kind
-      when :never;      ""
+      when :never;      start_date.to_s
       when :weekly;     weekly_humanize
       when :monthly;    monthly_humanize
       when :annually;   yearly_humanize
