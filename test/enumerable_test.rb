@@ -189,6 +189,30 @@ class EnumerableTest < ActiveSupport::TestCase
   
   
   
+  test "should not predict dates before the beginning of a schedule" do
+    schedule = Schedule.new({
+      :kind => :weekly,
+      :weekly_pattern => %w{Monday},
+      :start_date => Date.new(2011, 1, 3),
+      :ends => true,
+      :end_date => Date.new(2011, 1, 31)})
+    assert_equal nil, schedule.first_occurrence_before(Date.new(2011,1,3))
+    assert_equal nil, schedule.first_occurrence_on_or_before(Date.new(2011,1,2))
+  end
+  
+  test "should not predict dates after the end of a schedule" do
+    schedule = Schedule.new({
+      :kind => :weekly,
+      :weekly_pattern => %w{Monday},
+      :start_date => Date.new(2011, 1, 3),
+      :ends => true,
+      :end_date => Date.new(2011, 1, 31)})
+    assert_equal nil, schedule.first_occurrence_after(Date.new(2011,1,31))
+    assert_equal nil, schedule.first_occurrence_on_or_after(Date.new(2011,2, 1))
+  end
+  
+  
+  
   test "all methods should take any kind of date as an argument" do
     schedule = Schedule.new({
       :kind => :weekly,

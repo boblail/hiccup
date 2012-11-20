@@ -23,7 +23,7 @@ module Hiccup
       end
       
       
-      def first_occurrence_on_or_after(date)        
+      def first_occurrence_on_or_after(date)
         result = nil
         wday = date.wday
         weekly_pattern.each do |weekday|

@@ -7,6 +7,8 @@ module Hiccup
         @schedule = schedule
         @date = date
         @date = @date.to_date if @date.respond_to?(:to_date)
+        @date = start_date if (@date < start_date)
+        @date = end_date if (ends? && @date > end_date)
         @current_date = nil
       end
       

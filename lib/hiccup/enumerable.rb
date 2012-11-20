@@ -30,8 +30,6 @@ module Hiccup
     
     
     def occurrences_between(earlier_date, later_date)
-      earlier_date = start_date if earlier_date < start_date
-      
       occurrences = []
       enum = enumerator.new(self, earlier_date)
       while (occurrence = enum.next) && (occurrence <= later_date)
@@ -43,7 +41,7 @@ module Hiccup
     
     
     def first_occurrence_on_or_after(date)
-      date = start_date if (date < start_date)
+      return nil if ends? && date > end_date
       enumerator.new(self, date).next
     end
     
@@ -55,7 +53,7 @@ module Hiccup
     
     
     def first_occurrence_on_or_before(date)
-      date = end_date if (ends? && date > end_date)
+      return nil if date < start_date
       enumerator.new(self, date).prev
     end
     
@@ -67,7 +65,7 @@ module Hiccup
     
     def occurs_on(date)
       date = date.to_date
-      first_occurrence_on_or_after(date).eql?(date)
+      date == first_occurrence_on_or_after(date)
     end
     alias :contains? :occurs_on
     
@@ -78,8 +76,6 @@ module Hiccup
     end
     
     def n_occurrences_on_or_before(limit, date)
-      date = end_date if (ends? && date > end_date)
-      
       occurrences = []
       enum = enumerator.new(self, date)
       while (occurrence = enum.prev) && occurrences.length < limit
