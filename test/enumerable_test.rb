@@ -189,6 +189,19 @@ class EnumerableTest < ActiveSupport::TestCase
   
   
   
+  test "all methods should take any kind of date as an argument" do
+    schedule = Schedule.new({
+      :kind => :weekly,
+      :weekly_pattern => %w{Monday},
+      :start_date => Date.new(2011, 1, 1),
+      :ends => true,
+      :end_date => Date.new(2011, 1, 31)})
+    assert_equal Date.new(2011, 1, 17), schedule.first_occurrence_after(Time.new(2011, 1, 10))
+    assert_equal Date.new(2011, 1, 3), schedule.first_occurrence_before(Time.new(2011, 1, 10))
+  end
+  
+  
+  
   def test_weekly_recurrence_and_skip
     schedule = Schedule.new({
       :kind => :weekly,
