@@ -11,12 +11,7 @@ module Hiccup
     
     
     def enumerator
-      @enumerator ||= "Hiccup::Enumerable::#{kind.to_s.classify}Enumerator".constantize
-    end
-    
-    def kind=(value)
-      super
-      @enumerator = nil
+      "Hiccup::Enumerable::#{kind.to_s.classify}Enumerator".constantize
     end
     
     
