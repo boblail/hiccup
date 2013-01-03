@@ -61,11 +61,11 @@ class EnumerableTest < ActiveSupport::TestCase
       :start_date => Date.new(2009,3,15),
       :ends => true,
       :end_date => Date.new(2009,11,30)})
-    dates = schedule.occurrences_during_month(2009,7).map {|date| date.day}
+    dates = occurrences_during_month(schedule, 2009,7).map {|date| date.day}
     expected_dates = [1,3,6,8,10,13,15,17,20,22,24,27,29,31]
     assert_equal expected_dates, dates,                 "occurrences_during_month did not generate expected dates for weekly schedule"
     
-    dates = schedule.occurrences_during_month(2008,7).map {|date| date.day}
+    dates = occurrences_during_month(schedule, 2008,7).map {|date| date.day}
     expected_dates = []
     assert_equal expected_dates, dates,                 "occurrences_during_month should generate no occurrences if before start_date"
     
@@ -75,7 +75,7 @@ class EnumerableTest < ActiveSupport::TestCase
       :start_date => Date.new(2010,6,14),
       :ends => true,
       :end_date => Date.new(2010,6,21)})
-    dates = schedule.occurrences_during_month(2010,6).map {|date| date.day}
+    dates = occurrences_during_month(schedule, 2010,6).map {|date| date.day}
     expected_dates = [14,21]
     assert_equal expected_dates, dates,                 "occurrences_during_month did not correctly observe end date for weekly schedule"
   end
@@ -87,15 +87,15 @@ class EnumerableTest < ActiveSupport::TestCase
       :kind => :monthly,
       :monthly_pattern => [[2, "Sunday"], [4, "Sunday"]],
       :start_date => Date.new(2004,3,15)})
-    dates = schedule.occurrences_during_month(2009,12).map {|date| date.day}
+    dates = occurrences_during_month(schedule, 2009,12).map {|date| date.day}
     expected_dates = [13,27]
     assert_equal expected_dates, dates,                 "occurrences_during_month did not generate expected dates for monthly schedule"
     
-    dates = schedule.occurrences_during_month(2009,2).map {|date| date.day}
+    dates = occurrences_during_month(schedule, 2009,2).map {|date| date.day}
     expected_dates = [8,22]
     assert_equal expected_dates, dates,                 "occurrences_during_month did not generate expected dates for monthly schedule"
     
-    dates = schedule.occurrences_during_month(1991,7).map {|date| date.day}
+    dates = occurrences_during_month(schedule, 1991,7).map {|date| date.day}
     expected_dates = []
     assert_equal expected_dates, dates,                 "occurrences_during_month should generate no occurrences if before start_date"
   end
@@ -266,23 +266,23 @@ class EnumerableTest < ActiveSupport::TestCase
     schedule = Schedule.new({
       :kind => :annually,
       :start_date => Date.new(1981,4,23)})
-    dates = schedule.occurrences_during_month(1981,4).map {|date| date.day}
+    dates = occurrences_during_month(schedule, 1981,4).map {|date| date.day}
     expected_dates = [23]
     assert_equal expected_dates, dates,                 "occurrences_during_month did not generate expected dates for annual schedule"
     
-    dates = schedule.occurrences_during_month(1972,4).map {|date| date.day}
+    dates = occurrences_during_month(schedule, 1972,4).map {|date| date.day}
     expected_dates = []
     assert_equal expected_dates, dates,                 "occurrences_during_month did not generate expected dates for annual schedule"
     
-    dates = schedule.occurrences_during_month(1984,4).map {|date| date.day}
+    dates = occurrences_during_month(schedule, 1984,4).map {|date| date.day}
     expected_dates = [23]
     assert_equal expected_dates, dates,                 "occurrences_during_month did not generate expected dates for annual schedule"
 
-    dates = schedule.occurrences_during_month(1984,3).map {|date| date.day}
+    dates = occurrences_during_month(schedule, 1984,3).map {|date| date.day}
     expected_dates = []
     assert_equal expected_dates, dates,                 "occurrences_during_month did not generate expected dates for annual schedule"
 
-    dates = schedule.occurrences_during_month(2009,12).map {|date| date.day}
+    dates = occurrences_during_month(schedule, 2009,12).map {|date| date.day}
     expected_dates = []
     assert_equal expected_dates, dates,                 "occurrences_during_month did not generate expected dates for annual schedule"
   end
@@ -297,7 +297,7 @@ class EnumerableTest < ActiveSupport::TestCase
     
     # There are not 5 Mondays during June 2010
     assert_nothing_raised do
-      assert_equal [], schedule.occurrences_during_month(2010, 6)
+      assert_equal [], occurrences_during_month(schedule, 2010, 6)
     end
     
     next_fifth_month = Date.new(2010,8,30)
@@ -326,8 +326,8 @@ class EnumerableTest < ActiveSupport::TestCase
       :start_date => Date.new(2008, 2, 29)
     });
     
-    assert_equal [Date.new(2010, 2, 28)], schedule.occurrences_during_month(2010, 2)
-    assert_equal [Date.new(2012, 2, 29)], schedule.occurrences_during_month(2012, 2)
+    assert_equal [Date.new(2010, 2, 28)], occurrences_during_month(schedule, 2010, 2)
+    assert_equal [Date.new(2012, 2, 29)], occurrences_during_month(schedule, 2012, 2)
   end
   
   
@@ -339,8 +339,8 @@ class EnumerableTest < ActiveSupport::TestCase
       :start_date => Date.new(2008, 2, 29)
     })
     
-    assert_equal [Date.new(2010, 1, 31)], schedule.occurrences_during_month(2010, 1)
-    assert_equal [], schedule.occurrences_during_month(2010, 2)
+    assert_equal [Date.new(2010, 1, 31)], occurrences_during_month(schedule, 2010, 1)
+    assert_equal [], occurrences_during_month(schedule, 2010, 2)
   end
   
   
@@ -407,6 +407,18 @@ class EnumerableTest < ActiveSupport::TestCase
       end
       
     end
+  end
+  
+  
+  
+private
+  
+  
+  
+  def occurrences_during_month(schedule, year, month)
+    date1 = Date.new(year, month, 1)
+    date2 = Date.new(year, month, -1)
+    schedule.occurrences_between(date1, date2)
   end
   
   
