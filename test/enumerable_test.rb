@@ -198,6 +198,8 @@ class EnumerableTest < ActiveSupport::TestCase
       :end_date => Date.new(2011, 1, 31)})
     assert_equal nil, schedule.first_occurrence_before(Date.new(2011,1,3))
     assert_equal nil, schedule.first_occurrence_on_or_before(Date.new(2011,1,2))
+    assert_equal nil, schedule.n_occurrences_before(10, Date.new(2011,1,3))
+    assert_equal nil, schedule.n_occurrences_on_or_before(10, Date.new(2011,1,2))
   end
   
   test "should not predict dates after the end of a schedule" do

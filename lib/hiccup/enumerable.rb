@@ -72,6 +72,8 @@ module Hiccup
     end
     
     def n_occurrences_on_or_before(limit, date)
+      return nil if date < start_date
+      
       occurrences = []
       enum = enumerator.new(self, date)
       while (occurrence = enum.prev) && occurrences.length < limit
