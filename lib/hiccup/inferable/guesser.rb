@@ -7,11 +7,16 @@ module Hiccup
       def initialize(klass, options={})
         @klass = klass
         @verbose = options.fetch(:verbose, false)
+        @allow_skips = options.fetch(:allow_skips, true)
         @scorer = options.fetch(:scorer, Scorer.new(options))
         start!
       end
       
       attr_reader :confidence, :schedule, :dates, :scorer
+      
+      def allow_skips?
+        @allow_skips
+      end
       
       def start!
         @dates = []
@@ -64,7 +69,7 @@ module Hiccup
         start_date = Date.new(@start_date.year, *most_popular)
         
         [].tap do |guesses|
-          (1...5).each do |skip|
+          skip_range.each do |skip|
             guesses << @klass.new.tap do |schedule|
               schedule.kind = :annually
               schedule.start_date = start_date
@@ -95,7 +100,7 @@ module Hiccup
         end
         
         [].tap do |guesses|
-          (1...5).each do |skip|
+          skip_range.each do |skip|
             enumerate_by_popularity(days_by_popularity) do |days|
               guesses << @klass.new.tap do |schedule|
                 schedule.kind = :monthly
@@ -134,7 +139,7 @@ module Hiccup
                  "    by_popularity: #{wdays_by_popularity.inspect}"
           end
           
-          (1...5).each do |skip|
+          skip_range.each do |skip|
             enumerate_by_popularity(wdays_by_popularity) do |wdays|
               guesses << @klass.new.tap do |schedule|
                 schedule.kind = :weekly
@@ -146,6 +151,11 @@ module Hiccup
             end
           end
         end
+      end
+      
+      def skip_range
+        return 1..1 unless allow_skips?
+        1...5
       end
       
       
