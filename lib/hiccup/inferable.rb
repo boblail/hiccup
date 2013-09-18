@@ -20,7 +20,7 @@ module Hiccup
         
         dates = extract_array_of_dates!(dates)
         enumerator = DatesEnumerator.new(dates)
-        guesser = Guesser.new(self, {verbose: verbosity >= 2})
+        guesser = options.fetch :guesser, Guesser.new(self, options.merge(verbose: verbosity >= 2))
         schedules = []
         
         confidences = []
