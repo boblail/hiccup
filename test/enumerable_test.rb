@@ -3,7 +3,6 @@ require "test_helper"
 
 class EnumerableTest < ActiveSupport::TestCase
   include Hiccup
-  PERFORMANCE_TEST = false
   
   
   
@@ -347,7 +346,7 @@ class EnumerableTest < ActiveSupport::TestCase
   
   
   
-  if PERFORMANCE_TEST
+  if ENV['PERFORMANCE_TEST']
     test "performance test" do
       n = 100
       
