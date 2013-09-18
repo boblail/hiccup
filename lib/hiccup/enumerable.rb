@@ -84,5 +84,26 @@ module Hiccup
     
     
     
+    def first_n_occurrences(limit)
+      n_occurrences_on_or_after(limit, start_date)
+    end
+    
+    def n_occurrences_after(limit, date)
+      n_occurrences_on_or_after(limit, date.to_date + 1)
+    end
+    
+    def n_occurrences_on_or_after(limit, date)
+      return [] if ends? and date > end_date
+      
+      occurrences = []
+      enum = enumerator.new(self, date)
+      while (occurrence = enum.next) && occurrences.length < limit
+        occurrences << occurrence
+      end
+      occurrences
+    end
+    
+    
+    
   end
 end
