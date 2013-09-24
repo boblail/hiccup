@@ -26,6 +26,9 @@ module Hiccup
     
     
     def occurrences_between(earlier_date, later_date)
+      return [] if ends? && earlier_date > end_date
+      return [] if later_date < start_date
+      
       occurrences = []
       enum = enumerator.new(self, earlier_date)
       while (occurrence = enum.next) && (occurrence <= later_date)

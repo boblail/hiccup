@@ -210,6 +210,7 @@ class EnumerableTest < ActiveSupport::TestCase
       :end_date => Date.new(2011, 1, 31)})
     assert_equal nil, schedule.first_occurrence_after(Date.new(2011,1,31))
     assert_equal nil, schedule.first_occurrence_on_or_after(Date.new(2011,2, 1))
+    assert_equal [], schedule.occurrences_between(Date.new(2013, 9, 23), Date.new(2013, 9, 30))
   end
   
   
