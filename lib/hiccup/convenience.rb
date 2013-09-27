@@ -20,7 +20,8 @@ module Hiccup
     
     
     def ends?
-      (ends == true) || %w{true 1 t}.member?(ends)
+      return %w{true 1 t}.member?(ends) if ends.is_a?(String)
+      !!ends
     end
     
     
