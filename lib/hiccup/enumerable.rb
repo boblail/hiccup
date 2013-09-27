@@ -67,6 +67,7 @@ module Hiccup
       date == first_occurrence_on_or_after(date)
     end
     alias :contains? :occurs_on
+    alias :predicts? :occurs_on
     
     
     

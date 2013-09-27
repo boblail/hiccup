@@ -42,7 +42,7 @@ module Hiccup
           
           confidence = confidence.to_f
           confidences << confidence
-          predicted = guess.contains?(date)
+          predicted = guess.predicts?(date)
           
           # if the last two confidences are both below a certain
           # threshhold and both declining, back up to where we
