@@ -262,4 +262,21 @@ class InferableTest < ActiveSupport::TestCase
   
   
   
+  if ENV['PERFORMANCE_TEST']
+    test "performance test" do
+      Benchmark.bm(20) do |x|
+        [10, 25, 50, 100, 250, 500].each do |n|
+          seed = Date.today
+          dates = (0...n).each_with_object([]) { |i, array| array << seed + i * 7 }
+          x.report("#{n} dates") do
+            Schedule.infer(dates)
+          end
+        end
+      end
+    end
+  end
+  
+  
+  
+  
 end
