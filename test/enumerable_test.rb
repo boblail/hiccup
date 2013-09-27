@@ -349,7 +349,7 @@ class EnumerableTest < ActiveSupport::TestCase
   
   if ENV['PERFORMANCE_TEST']
     test "performance test" do
-      n = 100
+      n = 1000
       
       # Each of these schedules should describe 52 events
       
