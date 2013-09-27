@@ -23,7 +23,7 @@ module Hiccup
         else
           first_occurrence_on_or_after(@date)
         end
-        @current_date = nil if (ends? && @current_date && @current_date > end_date)
+        @current_date = nil if (@current_date && ends? && @current_date > end_date)
         @current_date
       end
       
