@@ -9,46 +9,15 @@ module Hiccup
         @verbose = options.fetch(:verbose, false)
         @allow_skips = options.fetch(:allow_skips, true)
         @max_complexity = options.fetch(:max_complexity, 3)
-        @scorer = options.fetch(:scorer, Scorer.new(options))
-        start!
       end
       
-      attr_reader :confidence, :schedule, :dates, :scorer, :max_complexity
+      attr_reader :max_complexity
       
       def allow_skips?
         @allow_skips
       end
       
-      def start!
-        @dates = []
-        @schedule = nil
-        @confidence = 0
-      end
-      alias :restart! :start!
       
-      
-      
-      
-      def <<(date)
-        @dates << date
-        @schedule, @confidence = best_schedule_for(@dates)
-        date
-      end
-      
-      def count
-        @dates.length
-      end
-      
-      def predicted?(date)
-        @schedule && @schedule.contains?(date)
-      end
-      
-      
-      
-      def best_schedule_for(dates)
-        guesses = generate_guesses(dates)
-        scorer.pick_best_guess(guesses, dates)
-      end
       
       def generate_guesses(dates)
         @start_date = dates.first

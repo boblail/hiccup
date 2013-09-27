@@ -21,8 +21,10 @@ module Hiccup
         dates = extract_array_of_dates!(dates)
         enumerator = DatesEnumerator.new(dates)
         guesser = options.fetch :guesser, Guesser.new(self, options.merge(verbose: verbosity >= 2))
-        schedules = []
+        scorer = options.fetch(:scorer, Scorer.new(options.merge(verbose: verbosity >= 2)))
         
+        dates = []
+        schedules = []
         confidences = []
         high_confidence_threshold = 0.6
         min_confidence_threshold  = 0.35
@@ -32,10 +34,15 @@ module Hiccup
         
         until enumerator.done?
           date = enumerator.next
-          guesser << date
-          confidence = guesser.confidence.to_f
+          dates << date
+          guesses = guesser.generate_guesses(dates)
+          
+          # ! can guess and confidence be nil here??
+          guess, confidence = scorer.pick_best_guess(guesses, dates)
+          
+          confidence = confidence.to_f
           confidences << confidence
-          predicted = guesser.predicted?(date)
+          predicted = guess.contains?(date)
           
           # if the last two confidences are both below a certain
           # threshhold and both declining, back up to where we
@@ -51,20 +58,20 @@ module Hiccup
           
           if predicted && confidence >= min_confidence_threshold
             iterations_since_last_confident_schedule = 0
-            last_confident_schedule = guesser.schedule
+            last_confident_schedule = guess
           else
             iterations_since_last_confident_schedule += 1
           end
           
-          rewind_by = iterations_since_last_confident_schedule == guesser.count ? iterations_since_last_confident_schedule - 1 : iterations_since_last_confident_schedule
+          rewind_by = iterations_since_last_confident_schedule == dates.count ? iterations_since_last_confident_schedule - 1 : iterations_since_last_confident_schedule
           
           
           
           if verbosity >= 1
             output = "  #{enumerator.index.to_s.rjust(3)} #{date}"
-            output << " #{"[#{guesser.count}]".rjust(5)}  =>  "
-            output << "~#{(guesser.confidence.to_f * 100).to_i.to_s.rjust(2, "0")} @ "
-            output << guesser.schedule.humanize.ljust(130)
+            output << " #{"[#{dates.count}]".rjust(5)}  =>  "
+            output << "~#{(confidence * 100).to_i.to_s.rjust(2, "0")} @ "
+            output << guess.humanize.ljust(130)
             output << "  :( move back #{rewind_by}" unless confident
             puts output
           end
@@ -76,13 +83,13 @@ module Hiccup
             if last_confident_schedule
               schedules << last_confident_schedule
             elsif allow_null_schedules
-              guesser.dates.take(guesser.count - rewind_by).each do |date|
+              dates.take(dates.count - rewind_by).each do |date|
                 schedules << self.new(:kind => :never, :start_date => date)
               end
             end
             
             enumerator.rewind_by(rewind_by)
-            guesser.restart!
+            dates = []
             confidences = []
             iterations_since_last_confident_schedule = 0
             last_confident_schedule = nil
@@ -92,7 +99,7 @@ module Hiccup
         if last_confident_schedule
           schedules << last_confident_schedule
         elsif allow_null_schedules
-          guesser.dates.each do |date|
+          dates.each do |date|
             schedules << self.new(:kind => :never, :start_date => date)
           end
         end
