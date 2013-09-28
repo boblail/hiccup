@@ -79,6 +79,17 @@ class EnumerableTest < ActiveSupport::TestCase
     assert_equal expected_dates, dates,                 "occurrences_during_month did not correctly observe end date for weekly schedule"
   end
   
+  test "should keep weekly occurrences during a week together when skipping" do
+    schedule = Schedule.new(
+      :kind => :weekly,
+      :weekly_pattern => %w{Tuesday Thursday},
+      :start_date => Date.new(2013, 10, 2), # Wednesday
+      :skip => 2)
+    
+    dates = occurrences_during_month(schedule, 2013, 10).map(&:day)
+    assert_equal [3,  15, 17,  29, 31], dates
+  end
+  
   
   
   def test_monthly_occurrences_during_month
@@ -233,7 +244,7 @@ class EnumerableTest < ActiveSupport::TestCase
       :kind => :weekly,
       :weekly_pattern => %w{Monday},
       :skip => 3,
-      :start_date => Date.new(2011,1,1)})
+      :start_date => Date.new(2011,1,1)}) # Saturday
     expected_dates = [[1,3], [1,24], [2,14], [3,7], [3,28]]
     expected_dates.map! {|pair| Date.new(2011, *pair)}
     assert_equal expected_dates, schedule.occurrences_between(Date.new(2011,1,1), Date.new(2011,3,31))
