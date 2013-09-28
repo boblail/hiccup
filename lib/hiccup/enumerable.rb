@@ -11,7 +11,7 @@ module Hiccup
     
     
     def enumerator
-      "Hiccup::Enumerable::#{kind.to_s.classify}Enumerator".constantize
+      ScheduleEnumerator.enum_for(self)
     end
     
     

@@ -3,6 +3,14 @@ module Hiccup
   module Enumerable
     class ScheduleEnumerator
       
+      
+      
+      def self.enum_for(schedule)
+        "Hiccup::Enumerable::#{schedule.kind.to_s.classify}Enumerator".constantize
+      end
+      
+      
+      
       def initialize(schedule, date)
         @schedule = schedule
         @date = date
