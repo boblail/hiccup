@@ -5,6 +5,15 @@ module Hiccup
     class MonthlyEnumerator < ScheduleEnumerator
       
       
+      def self.for(schedule)
+        if schedule.monthly_pattern.all? { |occurrence| Fixnum === occurrence }
+          MonthlyDateEnumerator
+        else
+          self
+        end
+      end
+      
+      
       def first_occurrence_on_or_after(date)
         result = nil
         monthly_pattern.each do |occurrence|
@@ -82,3 +91,5 @@ module Hiccup
     end
   end
 end
+
+require "hiccup/enumerable/monthly_date_enumerator"

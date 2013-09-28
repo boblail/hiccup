@@ -9,7 +9,7 @@ module Hiccup
         case schedule.kind
         when :weekly then WeeklyEnumerator
         when :annually then AnnuallyEnumerator
-        when :monthly then MonthlyEnumerator
+        when :monthly then MonthlyEnumerator.for(schedule)
         else NeverEnumerator
         end
       end
