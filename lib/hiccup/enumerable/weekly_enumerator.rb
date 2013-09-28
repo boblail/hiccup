@@ -4,43 +4,53 @@ module Hiccup
   module Enumerable
     class WeeklyEnumerator < ScheduleEnumerator
       
-      
       def initialize(*args)
         super
         
-        @base_date = start_date
-        wday = start_date.wday
-        wdays = weekly_pattern.map { |weekday| Date::DAYNAMES.index(weekday) }
+        @wday_pattern = weekly_pattern.map do |weekday|
+          Date::DAYNAMES.index(weekday)
+        end.sort
         
-        if wday <= wdays.min or wday > wdays.max
+        start_wday = start_date.wday
+        if start_wday <= @wday_pattern.first or start_wday > @wday_pattern.last
           @base_date = start_date
         else
-          @base_date = start_date - (wday - wdays.min)
+          @base_date = start_date - (start_wday - @wday_pattern.first)
         end
         
-        # Use more efficient iterator methods if
-        # weekly_pattern is simple enough
-        
-        if weekly_pattern.length == 1
-          def self.next_occurrence_after(date)
-            date + skip * 7
-          end
-          
-          def self.next_occurrence_before(date)
-            date - skip * 7
-          end
-        end
+        @starting_index = wday_pattern.index { |wday| wday >= start_wday } || 0
+        @cycle = calculate_cycle(schedule)
       end
       
+    protected
       
-      attr_reader :base_date
+      
+      
+      attr_reader :base_date,
+                  :wday_pattern,
+                  :starting_index,
+                  :cycle,
+                  :position
+      
+      
+      
+      def advance!
+        date = cursor + cycle[position]
+        @position = (position + 1) % cycle.length
+        date
+      end
+      
+      def rewind!
+        @position = position <= 0 ? cycle.length - 1 : position - 1
+        cursor - cycle[position]
+      end
+      
       
       
       def first_occurrence_on_or_after(date)
         result = nil
         wday = date.wday
-        weekly_pattern.each do |weekday|
-          wd = Date::DAYNAMES.index(weekday)
+        wday_pattern.each do |wd|
           wd = wd + 7 if wd < wday
           days_in_the_future = wd - wday
           temp = date + days_in_the_future
@@ -50,14 +60,14 @@ module Hiccup
           
           result = temp if !result || (temp < result)
         end
+        @position = position_of(result)
         result
       end
       
       def first_occurrence_on_or_before(date)
         result = nil
         wday = date.wday
-        weekly_pattern.each do |weekday|
-          wd = Date::DAYNAMES.index(weekday)
+        wday_pattern.each do |wd|
           wd = wd - 7 if wd > wday
           days_in_the_past = wday - wd
           temp = date - days_in_the_past
@@ -67,8 +77,35 @@ module Hiccup
           
           result = temp if !result || (temp > result)
         end
+        @position = position_of(result)
         result
       end
+      
+      
+      
+      def calculate_cycle(schedule)
+        cycle = []
+        offset = wday_pattern[starting_index]
+        wdays = wday_pattern.map { |wday| wday - offset }.sort
+        
+        while wdays.first <= 0
+          wdays.push (wdays.shift + 7 * skip)
+        end
+        
+        cycle = [wdays.first]
+        wdays.each_cons(2) do |wday1, wday2|
+          cycle << (wday2 - wday1)
+        end
+        cycle
+      end
+      
+      def position_of(date)
+        date_i = wday_pattern.index(date.wday)
+        position = date_i - starting_index
+        position += wday_pattern.length if position < 0
+        position
+      end
+      
       
       
     end

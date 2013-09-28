@@ -4,51 +4,62 @@ module Hiccup
   module Enumerable
     class AnnuallyEnumerator < ScheduleEnumerator
       
-      
       def initialize(*args)
         super
-        
-        # Use more efficient iterator methods unless
-        # we have to care about leap years
-        
-        unless start_date.month == 2 && start_date.day == 29
-          def self.next_occurrence_after(date)
-            date.next_year(skip)
-          end
-          
-          def self.next_occurrence_before(date)
-            date.prev_year(skip)
-          end
-        end
+        @month, @day = start_date.month, start_date.day
+        @february_29 = month == 2 and day == 29
       end
+      
+    protected
+      
+      
+      attr_reader :month, :day, :year
+      
+      def february_29?
+        @february_29
+      end
+      
+      
+      
+      def advance!
+        @year += skip
+        to_date!
+      end
+      
+      def rewind!
+        @year -= skip
+        to_date!
+      end
+      
       
       
       def first_occurrence_on_or_after(date)
-        year, month, day = date.year, start_date.month, start_date.day
-        day = -1 if month == 2 && day == 29
+        @year = date.year
+        @year += skip if (date.month > month) or (date.month == month and date.day > day)
         
-        result = Date.new(year, month, day)
-        year += 1 if result < date
+        remainder = (@year - start_date.year) % skip
+        @year += (skip - remainder) if remainder > 0
         
-        remainder = (year - start_date.year) % skip
-        year += (skip - remainder) if remainder > 0
-        
-        Date.new(year, month, day)
+        to_date!
       end
       
       def first_occurrence_on_or_before(date)
-        year, month, day = date.year, start_date.month, start_date.day
-        day = -1 if month == 2 && day == 29
+        @year = date.year
+        @year -= 1 if (date.month < month) or (date.month == month and date.day < day)
         
-        result = Date.new(year, month, day)
-        year -= 1 if result > date
+        remainder = (@year - start_date.year) % skip
+        @year -= remainder if remainder > 0
         
-        # what if year is before start_date.year?
-        remainder = (year - start_date.year) % skip
-        year -= remainder if remainder > 0
-        
+        to_date!
+      end
+      
+      
+      
+      def to_date!
+        return Date.new(year, month, 28) if february_29? and !leap_year?(year)
         Date.new(year, month, day)
       end
+      
       
       
     end

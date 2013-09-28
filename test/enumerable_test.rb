@@ -28,6 +28,15 @@ class EnumerableTest < ActiveSupport::TestCase
     assert_equal expected_dates, actual_dates
   end
   
+  test "annual recurrence with a skip, starting enumeration on an off year" do
+    schedule = Schedule.new({
+      :kind => :annually,
+      :skip => 2,
+      :start_date => Date.new(2009,3,4)})
+    assert_equal "2011-03-04", (schedule.first_occurrence_on_or_after Date.new(2010, 03, 01)).to_s
+    assert_equal "2011-03-04", (schedule.first_occurrence_on_or_before Date.new(2012, 03, 01)).to_s
+  end
+  
   
   
   def test_occurs_on_weekly

@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rails", "~> 3.2.8"
   s.add_development_dependency "turn"
   s.add_development_dependency "simplecov"
+  s.add_development_dependency "shoulda-context"
   s.add_development_dependency "pry"
   
   s.files         = `git ls-files`.split("\n")

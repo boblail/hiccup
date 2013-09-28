@@ -4,7 +4,6 @@ module Hiccup
   module Enumerable
     class MonthlyEnumerator < ScheduleEnumerator
       
-      
       def self.for(schedule)
         if schedule.monthly_pattern.all? { |occurrence| Fixnum === occurrence }
           MonthlyDateEnumerator
@@ -14,78 +13,104 @@ module Hiccup
       end
       
       
+      
+      def started?
+        !@position.nil?
+      end
+      
+      
+      
+    protected
+      
+      attr_reader :year, :month, :cycle, :last_day_of_month
+      
+      
+      
+      def advance!
+        @position += 1
+        next_month if @position >= cycle.length
+        
+        day = cycle[@position]
+        return self.next if day > last_day_of_month
+        Date.new(year, month, day)
+      end
+      
+      def rewind!
+        @position -= 1
+        prev_month if @position < 0
+        
+        day = cycle[@position]
+        return self.prev if day > last_day_of_month
+        Date.new(year, month, day)
+      end
+      
+      
+      
       def first_occurrence_on_or_after(date)
-        result = nil
-        monthly_pattern.each do |occurrence|
-          temp = nil
-          (0...30).each do |i| # If an occurrence doesn't occur this month, try up to 30 months in the future
-            temp = monthly_occurrence_to_date(occurrence, shift_date_by_months(date, i))
-            break if temp && (temp >= date)
-          end
-          next unless temp
-          
-          remainder = months_between(temp, start_date) % skip
-          temp = monthly_occurrence_to_date(occurrence, shift_date_by_months(temp, skip - remainder)) if remainder > 0
-          next unless temp
-          
-          result = temp if !result || (temp < result)
-        end
-        result
+        @year, @month = date.year, date.month
+        get_context
+        
+        @position = cycle.index { |day| day >= date.day }
+        next_month unless @position
+        
+        day = cycle[@position]
+        return self.next if day > last_day_of_month
+        Date.new(year, month, day)
       end
       
       def first_occurrence_on_or_before(date)
-        result = nil
-        monthly_pattern.each do |occurrence|
-          temp = nil
-          (0...30).each do |i| # If an occurrence doesn't occur this month, try up to 30 months in the past
-            temp = monthly_occurrence_to_date(occurrence, shift_date_by_months(date, -i))
-            break if temp && (temp <= date)
-          end
-          next unless temp
-          
-          remainder = months_between(temp, start_date) % skip
-          temp = monthly_occurrence_to_date(occurrence, shift_date_by_months(temp, -remainder)) if remainder > 0
-          next unless temp
-          
-          result = temp if !result || (temp > result)
-        end
-        result
-      end
-      
-      
-    private
-      
-      
-      def shift_date_by_months(date, months)
-        date.next_month(months)
-      end
-      
-      
-      def monthly_occurrence_to_date(occurrence, date)
-        year, month = date.year, date.month
+        @year, @month = date.year, date.month
+        get_context
         
-        day = begin
+        @position = cycle.index { |day| day <= date.day }
+        prev_month unless @position
+        
+        day = cycle[@position]
+        return self.prev if day > last_day_of_month
+        Date.new(year, month, day)
+      end
+      
+      
+      
+      def occurrences_in_month(year, month)
+        wday_of_first_of_month = Date.new(year, month, 1).wday
+        monthly_pattern.map do |occurrence|
           if occurrence.is_a?(Array)
             ordinal, weekday = occurrence
-            wday_of_first_of_month = Date.new(year, month, 1).wday
             wday = Date::DAYNAMES.index(weekday)
             day = wday
             day = day + 7 if (wday < wday_of_first_of_month)
             day = day - wday_of_first_of_month
             day = day + (ordinal * 7) - 6
+            day
           else
             occurrence
           end
         end
-        
-        last_day_of_month = Date.new(year, month, -1).day
-        (day > last_day_of_month) ? nil : Date.new(year, month, day)
       end
       
       
-      def months_between(later_date, earlier_date)
-        ((later_date.year - earlier_date.year) * 12) + (later_date.month - earlier_date.month).to_int
+      
+      def next_month
+        @position = 0
+        @month += skip
+        @year, @month = year + 1, month - 12 if month > 12
+        get_context
       end
+      
+      def prev_month
+        @position = @cycle.length - 1
+        @month -= skip
+        @year, @month = year - 1, month + 12 if month < 1
+        get_context
+      end
+      
+      def get_context
+        @last_day_of_month = [4, 6, 9, 11].member?(month) ? 30 : 31
+        @last_day_of_month = leap_year?(year) ? 29 : 28 if month == 2
+        @cycle = occurrences_in_month(year, month).sort
+      end
+      
       
       
     end
