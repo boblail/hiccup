@@ -16,15 +16,6 @@ module Hiccup
     
     
     
-    def occurrences_during_month(year, month)
-      puts "DEPRECATED: `occurrences_during_month` will be removed in 0.5.0. Use `occurrences_between` instead"
-      date1 = Date.new(year, month, 1)
-      date2 = Date.new(year, month, -1)
-      occurrences_between(date1, date2)
-    end
-    
-    
-    
     def occurrences_between(earlier_date, later_date)
       return [] if ends? && earlier_date > end_date
       return [] if later_date < start_date
