@@ -6,7 +6,12 @@ module Hiccup
       
       
       def self.enum_for(schedule)
-        "Hiccup::Enumerable::#{schedule.kind.to_s.classify}Enumerator".constantize
+        case schedule.kind
+        when :weekly then WeeklyEnumerator
+        when :annually then AnnuallyEnumerator
+        when :monthly then MonthlyEnumerator
+        else NeverEnumerator
+        end
       end
       
       
