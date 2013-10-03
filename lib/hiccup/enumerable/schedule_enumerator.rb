@@ -1,4 +1,3 @@
-
 module Hiccup
   module Enumerable
     class ScheduleEnumerator
@@ -19,8 +18,6 @@ module Hiccup
         @ends = schedule.ends?
         @seed_date = seed_date
         @seed_date = seed_date.to_date if seed_date.respond_to?(:to_date)
-        @seed_date = start_date if (seed_date < start_date)
-        @seed_date = end_date if (ends? && seed_date > end_date)
         @cursor = nil
       end
       
@@ -29,13 +26,13 @@ module Hiccup
       
       
       def next
-        @cursor = started? ? advance! : first_occurrence_on_or_after(seed_date)
+        @cursor = started? ? advance! : first_occurrence_on_or_after(seed_start_date)
         return nil if ends? && @cursor > end_date
         @cursor
       end
       
       def prev
-        @cursor = started? ? rewind! : first_occurrence_on_or_before(seed_date)
+        @cursor = started? ? rewind! : first_occurrence_on_or_before(seed_end_date)
         return nil if @cursor < start_date
         @cursor
       end
@@ -64,6 +61,18 @@ module Hiccup
         return false unless (year % 4).zero?
         return (year % 400).zero? if (year % 100).zero?
         true
+      end
+      
+      
+      
+      def seed_start_date
+        return start_date if (seed_date < start_date)
+        seed_date
+      end
+      
+      def seed_end_date
+        return end_date if (ends? && seed_date > end_date)
+        seed_date
       end
       
       
