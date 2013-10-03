@@ -5,12 +5,21 @@ module Hiccup
     class NeverEnumerator < ScheduleEnumerator
       
       
+      def next
+        @cursor = @cursor ? nil : first_occurrence_on_or_after(seed_date)
+      end
+      
+      def prev
+        @cursor = @cursor ? nil : first_occurrence_on_or_before(seed_date)
+      end
+      
+      
       def first_occurrence_on_or_after(date)
-        date if date == start_date
+        start_date if date <= start_date
       end
       
       def first_occurrence_on_or_before(date)
-        date
+        start_date unless date < start_date
       end
       
       
