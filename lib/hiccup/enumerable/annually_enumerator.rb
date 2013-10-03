@@ -9,7 +9,7 @@ module Hiccup
         @month, @day = start_date.month, start_date.day
         
         if month == 2 and day == 29
-          def self.to_date!
+          def self.current_date
             Date.new(year, 2, leap_year?(year) ? 29 : 28)
           end
         end
@@ -25,12 +25,12 @@ module Hiccup
       
       def advance!
         @year += skip
-        to_date!
+        current_date
       end
       
       def rewind!
         @year -= skip
-        to_date!
+        current_date
       end
       
       
@@ -42,7 +42,7 @@ module Hiccup
         remainder = (@year - start_date.year) % skip
         @year += (skip - remainder) if remainder > 0
         
-        to_date!
+        current_date
       end
       
       def first_occurrence_on_or_before(date)
@@ -52,12 +52,12 @@ module Hiccup
         remainder = (@year - start_date.year) % skip
         @year -= remainder if remainder > 0
         
-        to_date!
+        current_date
       end
       
       
       
-      def to_date!
+      def current_date
         Date.new(year, month, day)
       end
       
