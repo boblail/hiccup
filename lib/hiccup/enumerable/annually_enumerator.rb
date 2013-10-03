@@ -7,17 +7,19 @@ module Hiccup
       def initialize(*args)
         super
         @month, @day = start_date.month, start_date.day
-        @february_29 = month == 2 and day == 29
+        
+        if month == 2 and day == 29
+          def self.to_date!
+            Date.new(year, 2, leap_year?(year) ? 29 : 28)
+          end
+        end
       end
+      
+      attr_reader :month, :day
       
     protected
       
-      
-      attr_reader :month, :day, :year
-      
-      def february_29?
-        @february_29
-      end
+      attr_reader :year
       
       
       
@@ -56,7 +58,6 @@ module Hiccup
       
       
       def to_date!
-        return Date.new(year, month, 28) if february_29? and !leap_year?(year)
         Date.new(year, month, day)
       end
       
