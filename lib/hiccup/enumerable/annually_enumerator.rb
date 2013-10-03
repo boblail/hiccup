@@ -37,7 +37,7 @@ module Hiccup
       
       def first_occurrence_on_or_after(date)
         @year = date.year
-        @year += skip if (date.month > month) or (date.month == month and date.day > day)
+        @year += 1 if (date.month > month) or (date.month == month and date.day > day)
         
         remainder = (@year - start_date.year) % skip
         @year += (skip - remainder) if remainder > 0
