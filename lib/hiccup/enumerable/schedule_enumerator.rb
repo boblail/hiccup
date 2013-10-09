@@ -27,13 +27,13 @@ module Hiccup
       
       def next
         @cursor = started? ? advance! : first_occurrence_on_or_after(seed_start_date)
-        return nil if ends? && @cursor > end_date
+        return nil if @cursor && ends? && @cursor > end_date
         @cursor
       end
       
       def prev
         @cursor = started? ? rewind! : first_occurrence_on_or_before(seed_end_date)
-        return nil if @cursor < start_date
+        return nil if @cursor && @cursor < start_date
         @cursor
       end
       
