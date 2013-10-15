@@ -62,7 +62,7 @@ module Hiccup
         @year, @month = date.year, date.month
         get_context
         
-        @position = cycle.index { |day| day <= date.day }
+        @position = cycle.rindex { |day| day <= date.day }
         prev_month unless @position
         
         day = cycle[@position]
