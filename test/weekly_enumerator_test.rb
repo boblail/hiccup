@@ -93,6 +93,21 @@ class WeeklyEnumeratorTest < ActiveSupport::TestCase
   
   
   
+  context "with a complex schedule" do
+    setup do
+      @schedule = Schedule.new(
+        :kind => :weekly,
+        :start_date => Date.new(2013, 9, 26), # Thursday
+        :weekly_pattern => ["Tuesday", "Thursday", "Friday"])
+    end
+    
+    should "pick the right date when enumerating backward" do
+      enumerator = @schedule.enumerator.new(@schedule, Date.new(2013, 10, 16)) # Wednesday!
+      assert_equal Date.new(2013, 10, 15), enumerator.prev
+    end
+  end
+  
+  
 private
   
   def cycle_for(options={})
