@@ -1,8 +1,11 @@
 # Hiccup
 
-Hiccup mixes a-la-cart recurrence features into your recurring model. It doesn't dictate the data structure of your model, just the interface. It works just like Devise does for authenticatable models.
+[![Build Status](https://travis-ci.org/boblail/hiccup.png?branch=master)](https://travis-ci.org/boblail/hiccup)
+[![Code Climate](https://codeclimate.com/github/boblail/hiccup.png)](https://codeclimate.com/github/boblail/hiccup)
 
-Hiccup does provide an extremely lightweight `Schedule` class that mixes in all of Hiccup's feature, but you don't have to use Hiccup's Schedul if you don't want to.
+Hiccup mixes a-la-cart recurrence features into your recurring model. It doesn't dictate the data structure of your model, just the interface. It works like Devise does for authenticatable models.
+
+Hiccup does provide a lightweight `Schedule` class that mixes in all of Hiccup's feature, but you don't have to use Hiccup's Schedule if you don't want to.
 
 ### Usage
 
@@ -52,13 +55,56 @@ Schedule.new(:kind => :monthly, :monthly_pattern => [[2, "Sunday"], [4, "Sunday"
 
 Supplies methods for creating instances of a recurring pattern
 
+Examples
+
+```ruby
+schedule = Schedule.new(
+  :kind => :weekly,
+  :weekly_pattern => %w{Monday Wednesday Friday},
+  :start_date => Date.new(2009, 3, 15))
+
+# includes?
+schedule.includes? Date.new(2009, 5, 20) # => true
+schedule.includes? Date.new(2009, 3, 15) # => false (3/15/09 is a Sunday)
+
+# occurrences_between
+schedule.occurrences_between(
+  Date.new(2009, 3, 26),
+  Date.new(2009, 3, 31)) #=> [Fri, 27 Mar 2009, Mon, 30 Mar 2009]
+
+# n_occurrences_before
+schedule.n_occurrences_before(3, Date.new(2009, 3, 31)) # => [Mon, 30 Mar 2009, Fri, 27 Mar 2009, Wed, 25 Mar 2009]
+```
+
+
+
 ### Validatable
 
 Mixes in ActiveModel validations for recurrence models
 
+
+
 ### Humanizable
 
 Represents a recurring pattern in a human-readable string
+
+Examples:
+
+```ruby
+# A monthly recurrence
+schedule = Schedule.new(:kind => :monthly, :monthly_pattern => [[-1, "Tuesday"]])
+schedule.humanize # => "The last Tuesday of every month"
+
+# With skips
+schedule = Schedule.new(:kind => :weekly, :weekly_pattern => %w[Sunday], :skip => 2)
+schedule.humanize # => "Every other Sunday"
+
+# An anniversary
+schedule = Schedule.new(:kind => :annually, start_date: Date.new(2012, 10, 1))
+schedule.humanize # => "Every year on October 1"
+```
+
+
 
 ### Inferable
 
@@ -77,6 +123,31 @@ schedule = Schedule.infer %w{2012-3-6 2012-3-8 2012-3-15 2012-3-20 2012-3-27 201
 schedule.humanize # => "Every Tuesday and Thursday"
 ```
 
+
+
 ### Serializable
 
 Supports serializing and deserializing a recurrence pattern to an array of formats
+
+Examples:
+
+```ruby
+schedule = Schedule.from_ical <<-ICAL
+DTSTART;VALUE=DATE-TIME:20090101T000000Z
+RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=TU,TH
+ICAL
+schedule.humanize # => "Tuesday and Thursday of every other week"
+
+schedule = Schedule.new(
+  :kind => :weekly,
+  :weekly_pattern => %w{Tuesday Thursday},
+  :start_date => DateTime.new(2009, 1, 1),
+  :skip => 2)
+schedule.to_ical # => "DTSTART;VALUE=DATE-TIME:20090101T000000Z\nRRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=TU,TH\n"
+```
+
+
+
+## License
+
+Copyright (c) 2012 Bob Lail, released under the MIT license
