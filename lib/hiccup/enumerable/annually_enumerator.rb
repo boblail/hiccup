@@ -26,11 +26,15 @@ module Hiccup
       def advance!
         @year += skip
         current_date
+      rescue
+        advance!
       end
       
       def rewind!
         @year -= skip
         current_date
+      rescue
+        rewind!
       end
       
       
@@ -43,6 +47,8 @@ module Hiccup
         @year += (skip - remainder) if remainder > 0
         
         current_date
+      rescue
+        advance!
       end
       
       def first_occurrence_on_or_before(date)
@@ -53,6 +59,8 @@ module Hiccup
         @year -= remainder if remainder > 0
         
         current_date
+      rescue
+        rewind!
       end
       
       

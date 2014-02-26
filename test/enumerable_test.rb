@@ -367,6 +367,46 @@ class EnumerableTest < ActiveSupport::TestCase
   
   
   
+  context "when a weekly schedule includes October 1582" do
+    setup do
+      @schedule = Schedule.new(
+        kind: :weekly,
+        weekly_pattern: %w{Monday},
+        start_date: Date.new(1582, 10, 1))
+    end
+    
+    should "just skip the invalid dates" do
+      assert_equal %w{10/01 10/18 10/25}, occurrences_during_month(@schedule, 1582, 10).map { |d| d.strftime("%m/%d") }
+    end
+  end
+  
+  context "when a monthly schedule includes October 1582" do
+    setup do
+      @schedule = Schedule.new(
+        kind: :monthly,
+        monthly_pattern: [5, 19],
+        start_date: Date.new(1582, 9, 5))
+    end
+    
+    should "just skip the invalid dates" do
+      assert_equal %w{10/19}, occurrences_during_month(@schedule, 1582, 10).map { |d| d.strftime("%m/%d") }
+    end
+  end
+  
+  context "when a yearly schedule includes October 1582" do
+    setup do
+      @schedule = Schedule.new(
+        kind: :annually,
+        start_date: Date.new(1580, 10, 8))
+    end
+    
+    should "just skip the invalid dates" do
+      assert_equal [], occurrences_during_month(@schedule, 1582, 10).map { |d| d.strftime("%m/%d") }
+    end
+  end
+  
+  
+  
   if ENV['PERFORMANCE_TEST']
     test "performance test" do
       n = 1000

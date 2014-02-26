@@ -33,6 +33,8 @@ module Hiccup
         day = cycle[@position]
         return self.next if day > last_day_of_month
         Date.new(year, month, day)
+      rescue
+        advance!
       end
       
       def rewind!
@@ -42,6 +44,8 @@ module Hiccup
         day = cycle[@position]
         return self.prev if day > last_day_of_month
         Date.new(year, month, day)
+      rescue
+        rewind!
       end
       
       
@@ -56,6 +60,8 @@ module Hiccup
         day = cycle[@position]
         return self.next if day > last_day_of_month
         Date.new(year, month, day)
+      rescue
+        advance!
       end
       
       def first_occurrence_on_or_before(date)
@@ -68,6 +74,8 @@ module Hiccup
         day = cycle[@position]
         return self.prev if day > last_day_of_month
         Date.new(year, month, day)
+      rescue
+        rewind!
       end
       
       
