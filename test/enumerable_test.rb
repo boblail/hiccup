@@ -144,19 +144,64 @@ class EnumerableTest < ActiveSupport::TestCase
     end
 
     should "return the right dates" do
-      dates = schedule.n_occurrences_before(10, Date.new(2009, 10, 31)).map { |date| date.strftime("%Y-%m-%d") }      
+      dates = schedule.n_occurrences_before(10, Date.new(2009, 10, 31)).map { |date| date.strftime("%Y-%m-%d") }
       expected_dates = ["2009-10-30", "2009-10-28", "2009-10-26",
                         "2009-10-23", "2009-10-21", "2009-10-19",
                         "2009-10-16", "2009-10-14", "2009-10-12",
                         "2009-10-09" ]
-      assert_equal expected_dates, dates
+      assert_equal expected_dates, dates, "Expected the dates for the correct occurrences"
     end
     
     should "return a shorter array if no events exist before the given date" do
       dates = schedule.n_occurrences_before(10, Date.new(2009, 3, 20)).map { |date| date.strftime("%Y-%m-%d") }
       
       expected_dates = ["2009-03-18", "2009-03-16"]
-      assert_equal expected_dates, dates
+      assert_equal expected_dates, dates, "Expected the dates for the correct occurrences"
+    end
+
+    context "with blacklisted dates" do
+      should "still return the correct number of recurrences" do
+        dates = schedule.n_occurrences_before(3, Date.new(2009, 10, 31), except: [Date.new(2009, 10, 28)]).map { |date| date.strftime("%Y-%m-%d") }
+        assert_equal 3, dates.count, "Expected the same number of recurrences when blacklisting a date"
+        refute dates.member?("2009-10-28"), "Expected the blacklisted date to be omitted"
+        assert dates.member?("2009-10-23"), "Expected the next matching date to be included"
+      end
+    end
+  end
+
+  context "#n_occurrences_after" do
+    setup do
+      @schedule = Schedule.new({
+        :kind => :weekly,
+        :weekly_pattern => %w{Monday Wednesday Friday},
+        :start_date => Date.new(2009,3,15),
+        :ends => true,
+        :end_date => Date.new(2009,11,30)})
+    end
+
+    should "return the right dates" do
+      dates = schedule.n_occurrences_after(10, Date.new(2009, 10, 31)).map { |date| date.strftime("%Y-%m-%d") }
+      expected_dates = ["2009-11-02", "2009-11-04", "2009-11-06",
+                        "2009-11-09", "2009-11-11", "2009-11-13",
+                        "2009-11-16", "2009-11-18", "2009-11-20",
+                        "2009-11-23"]
+      assert_equal expected_dates, dates, "Expected the dates for the correct occurrences"
+    end
+
+    should "return a shorter array if no events exist before the given date" do
+      dates = schedule.n_occurrences_after(10, Date.new(2009, 11, 25)).map { |date| date.strftime("%Y-%m-%d") }
+
+      expected_dates = ["2009-11-27", "2009-11-30"]
+      assert_equal expected_dates, dates, "Expected the dates for the correct occurrences"
+    end
+
+    context "with blacklisted dates" do
+      should "still return the current number of recurrences" do
+        dates = schedule.n_occurrences_after(3, Date.new(2009, 10, 31), except: [Date.new(2009, 11, 4)]).map { |date| date.strftime("%Y-%m-%d") }
+        assert_equal 3, dates.count, "Expected the same number of recurrences when blacklisting a date"
+        refute dates.member?("2009-11-04"), "Expected the blacklisted date to be omitted"
+        assert dates.member?("2009-11-09"), "Expected the next matching date to be included"
+      end
     end
   end
   

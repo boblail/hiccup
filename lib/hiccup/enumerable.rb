@@ -59,34 +59,36 @@ module Hiccup
     
     
     
-    def n_occurrences_before(limit, date)
-      n_occurrences_on_or_before(limit, date.to_date - 1)
+    def n_occurrences_before(limit, date, options={})
+      n_occurrences_on_or_before(limit, date.to_date - 1, options)
     end
     
-    def n_occurrences_on_or_before(limit, date)
+    def n_occurrences_on_or_before(limit, date, options={})
+      exceptions = options.fetch(:except, [])
       occurrences = []
       enum = enumerator.new(self, date)
       while (occurrence = enum.prev) && occurrences.length < limit
-        occurrences << occurrence
+        occurrences << occurrence unless exceptions.member?(occurrence)
       end
       occurrences
     end
     
     
     
-    def first_n_occurrences(limit)
-      n_occurrences_on_or_after(limit, start_date)
+    def first_n_occurrences(limit, options={})
+      n_occurrences_on_or_after(limit, start_date, options)
     end
     
-    def n_occurrences_after(limit, date)
-      n_occurrences_on_or_after(limit, date.to_date + 1)
+    def n_occurrences_after(limit, date, options={})
+      n_occurrences_on_or_after(limit, date.to_date + 1, options)
     end
     
-    def n_occurrences_on_or_after(limit, date)
+    def n_occurrences_on_or_after(limit, date, options={})
+      exceptions = options.fetch(:except, [])
       occurrences = []
       enum = enumerator.new(self, date)
       while (occurrence = enum.next) && occurrences.length < limit
-        occurrences << occurrence
+        occurrences << occurrence unless exceptions.member?(occurrence)
       end
       occurrences
     end
