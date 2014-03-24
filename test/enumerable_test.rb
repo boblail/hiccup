@@ -3,6 +3,8 @@ require "test_helper"
 
 class EnumerableTest < ActiveSupport::TestCase
   include Hiccup
+
+  attr_reader :schedule
   
   
   
@@ -129,35 +131,33 @@ class EnumerableTest < ActiveSupport::TestCase
     assert schedule.contains?(expected_date)
   end
   
+
   
-  
-  def test_n_occurrences_before
-    schedule = Schedule.new({
-      :kind => :weekly,
-      :weekly_pattern => %w{Monday Wednesday Friday},
-      :start_date => Date.new(2009,3,15),
-      :ends => true,
-      :end_date => Date.new(2009,11,30)})
-    dates = schedule.n_occurrences_before(10, Date.new(2009, 10, 31)).map { |date| date.strftime("%Y-%m-%d") }
+  context "#n_occurrences_before" do
+    setup do
+      @schedule = Schedule.new({
+        :kind => :weekly,
+        :weekly_pattern => %w{Monday Wednesday Friday},
+        :start_date => Date.new(2009,3,15),
+        :ends => true,
+        :end_date => Date.new(2009,11,30)})
+    end
+
+    should "return the right dates" do
+      dates = schedule.n_occurrences_before(10, Date.new(2009, 10, 31)).map { |date| date.strftime("%Y-%m-%d") }      
+      expected_dates = ["2009-10-30", "2009-10-28", "2009-10-26",
+                        "2009-10-23", "2009-10-21", "2009-10-19",
+                        "2009-10-16", "2009-10-14", "2009-10-12",
+                        "2009-10-09" ]
+      assert_equal expected_dates, dates
+    end
     
-    expected_dates = ["2009-10-30", "2009-10-28", "2009-10-26",
-                      "2009-10-23", "2009-10-21", "2009-10-19",
-                      "2009-10-16", "2009-10-14", "2009-10-12",
-                      "2009-10-09" ]
-    assert_equal expected_dates, dates
-  end
-  
-  test "n_occurrences_before should return a shorter array if no events exist before the given date" do
-    schedule = Schedule.new({
-      :kind => :weekly,
-      :weekly_pattern => %w{Monday Wednesday Friday},
-      :start_date => Date.new(2009,3,15),
-      :ends => true,
-      :end_date => Date.new(2009,11,30)})
-    dates = schedule.n_occurrences_before(10, Date.new(2009, 3, 20)).map { |date| date.strftime("%Y-%m-%d") }
-    
-    expected_dates = ["2009-03-18", "2009-03-16"]
-    assert_equal expected_dates, dates
+    should "return a shorter array if no events exist before the given date" do
+      dates = schedule.n_occurrences_before(10, Date.new(2009, 3, 20)).map { |date| date.strftime("%Y-%m-%d") }
+      
+      expected_dates = ["2009-03-18", "2009-03-16"]
+      assert_equal expected_dates, dates
+    end
   end
   
   
