@@ -13,7 +13,7 @@ module Hiccup
       
       def dump(obj)
         @component = RiCal::Component::Event.new
-        @component.dtstart = obj.start_date.to_time
+        @component.dtstart = obj.start_date.to_time if obj.start_date
         @obj = obj
         
         case obj.kind

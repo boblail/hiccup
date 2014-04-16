@@ -266,6 +266,14 @@ class EnumerableTest < ActiveSupport::TestCase
     assert_equal [], schedule.n_occurrences_on_or_before(10, Date.new(2011,1,2))
   end
   
+  test "should predict nonrecurring dates before a date later than them" do
+    schedule = Schedule.new({
+      :kind => :never,
+      :start_date => Date.new(2011, 1, 3)})
+    assert_equal [Date.new(2011, 1, 3)], schedule.n_occurrences_on_or_before(10, Date.new(2011,1,3))
+    assert_equal [], schedule.n_occurrences_on_or_before(10, Date.new(2011,1,2))
+  end
+  
   test "should not predict dates after the end of a schedule" do
     schedule = Schedule.new({
       :kind => :weekly,

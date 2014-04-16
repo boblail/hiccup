@@ -22,6 +22,11 @@ class IcalSerializableTest < ActiveSupport::TestCase
     assert_equal :never, schedule.kind
   end
   
+  def test_formatting_an_empty_schedule
+    schedule = Schedule.new(:kind => :yearly, :start_date => "")
+    assert_equal "", schedule.to_ical
+  end
+  
   
   test_roundtrip(
     "No recurrence",
