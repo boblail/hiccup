@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.add_dependency "builder"
   
   s.add_development_dependency "ri_cal"
-  s.add_development_dependency "rails", ">= 3.2.8"
+  s.add_development_dependency "rails", ">= 3.2.8", "< 4.1.0"
   s.add_development_dependency "turn"
   s.add_development_dependency "simplecov"
   s.add_development_dependency "shoulda-context"
