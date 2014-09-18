@@ -8,9 +8,9 @@ module Hiccup
     
     
     
-    def humanize
+    def humanize(format: "%Y-%m-%d")
       case kind
-      when :never;      start_date.to_s
+      when :never;      start_date.strftime(format)
       when :weekly;     weekly_humanize
       when :monthly;    monthly_humanize
       when :annually;   yearly_humanize

@@ -78,6 +78,10 @@ class HumanizableTest < ActiveSupport::TestCase
     })
     assert_equal "Every year on July 4", independence_day.humanize
   end
+
+  test "should let you supply a format for strftime" do
+    assert_equal "July 4, 1776", Schedule.new(start_date: Date.new(1776, 7, 4)).humanize(format: "%B %-d, %Y")
+  end
   
   
   
