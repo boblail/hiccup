@@ -11,6 +11,13 @@ module Hiccup
           Date::DAYNAMES.index(weekday)
         end.sort
         
+        if @wday_pattern.empty?
+          @base_date = start_date
+          @starting_index = 0
+          @cycle = []
+          return
+        end
+        
         start_wday = start_date.wday
         if start_wday <= @wday_pattern.first or start_wday > @wday_pattern.last
           @base_date = start_date
@@ -60,7 +67,7 @@ module Hiccup
           
           result = temp if !result || (temp < result)
         end
-        @position = position_of(result)
+        @position = position_of(result) if result
         result
       end
       
@@ -77,7 +84,7 @@ module Hiccup
           
           result = temp if !result || (temp > result)
         end
-        @position = position_of(result)
+        @position = position_of(result) if result
         result
       end
       

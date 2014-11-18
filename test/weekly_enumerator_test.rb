@@ -108,6 +108,28 @@ class WeeklyEnumeratorTest < ActiveSupport::TestCase
   end
   
   
+  
+  context "Given an invalid schedule with no weekly pattern, it" do
+    setup do
+      @schedule = Schedule.new(
+        :kind => :weekly,
+        :start_date => Date.new(2013, 9, 26),
+        :weekly_pattern => [])
+    end
+    
+    should "return nil for prev rather than raising an exception" do
+      enumerator = @schedule.enumerator.new(@schedule, Date.today)
+      assert_equal nil, enumerator.prev
+    end
+    
+    should "return nil for next rather than raising an exception" do
+      enumerator = @schedule.enumerator.new(@schedule, Date.today)
+      assert_equal nil, enumerator.next
+    end
+  end
+  
+  
+  
 private
   
   def cycle_for(options={})
