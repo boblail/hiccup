@@ -68,6 +68,31 @@ class ValidatableTest < ActiveSupport::TestCase
   
   
   
+  context "skip" do
+    should "be positive" do
+      schedule = Schedule.new
+      schedule.skip = -5
+      schedule.valid?
+      assert schedule.errors[:skip].any?, "Expected skip to be invalid"
+    end
+    
+    should "be present" do
+      schedule = Schedule.new
+      schedule.skip = nil
+      schedule.valid?
+      assert schedule.errors[:skip].any?, "Expected skip to be invalid"
+    end
+    
+    should "be nonzero" do
+      schedule = Schedule.new
+      schedule.skip = 0
+      schedule.valid?
+      assert schedule.errors[:skip].any?, "Expected skip to be invalid"
+    end
+  end
+  
+  
+  
 private
   
   

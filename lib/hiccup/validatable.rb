@@ -10,6 +10,7 @@ module Hiccup
     
     # !todo: use ActiveModel:Validation rather than a custom method
     included do
+      validates :skip, numericality: {greater_than: 0}
       validate                    :validate_recurrence
     end
     
@@ -28,7 +29,6 @@ module Hiccup
       end
       
       errors.add(:start_date, "is a #{self.start_date.class} not a Date") unless self.start_date.is_a?(Date)
-      errors.add(:skip, "is not a positive integer") unless (skip.is_a? Fixnum) and (skip > 0)
       if ends?
         if self.end_date.is_a? Date
           errors.add(:end_date, "cannot be before start") if (self.end_date < self.start_date)
