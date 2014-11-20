@@ -28,12 +28,12 @@ module Hiccup
       else;             invalid_kind!
       end
       
-      errors.add(:start_date, "is a #{self.start_date.class} not a Date") unless self.start_date.is_a?(Date)
+      errors.add :start_date, "is a #{start_date.class} not a Date" unless start_date.is_a?(Date)
       if ends?
-        if self.end_date.is_a? Date
-          errors.add(:end_date, "cannot be before start") if (self.end_date < self.start_date)
+        if end_date.is_a?(Date)
+          errors.add :end_date, "cannot be before start" if start_date.is_a?(Date) && end_date < start_date
         else
-          errors.add(:end_date, "is a #{self.end_date.class} not a Date")
+          errors.add :end_date, "is a #{end_date.class} not a Date"
         end
       end
     end

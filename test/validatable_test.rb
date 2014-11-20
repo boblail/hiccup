@@ -93,6 +93,18 @@ class ValidatableTest < ActiveSupport::TestCase
   
   
   
+  context "When an end_date is supplied but not a start_date, it" do
+    should "record an error for the start_date but not for end_date" do
+      schedule = Schedule.new(kind: :weekly, ends: true, end_date: Date.today)
+      schedule.start_date = nil
+      refute schedule.valid?
+      assert schedule.errors[:start_date].any?
+      refute schedule.errors[:end_date].any?
+    end
+  end
+  
+  
+  
 private
   
   
