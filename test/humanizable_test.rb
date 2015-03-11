@@ -42,6 +42,10 @@ class HumanizableTest < ActiveSupport::TestCase
     {:kind => :monthly, :monthly_pattern => [4,5]})
     
   test_humanize(
+    "The last day of every month",
+    {:kind => :monthly, :monthly_pattern => [-1]})
+
+  test_humanize(
     "The first Monday of every month",
     {:kind => :monthly, :monthly_pattern => [[1, "Monday"]]})
     

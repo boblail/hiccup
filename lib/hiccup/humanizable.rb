@@ -50,7 +50,7 @@ module Hiccup
         ordinal = _skip.human_ordinalize
         sentence(ordinal, weekday.humanize)
       else
-        monthly_occurrence.ordinalize
+        monthly_occurrence < 0 ? "last day" : monthly_occurrence.ordinalize
       end
     end
     
