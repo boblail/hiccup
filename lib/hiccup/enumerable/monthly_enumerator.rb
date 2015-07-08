@@ -51,15 +51,19 @@ module Hiccup
       
       
       def first_occurrence_on_or_after(date)
-        @year, @month = date.year, date.month
+        @year, @month, seed_day = date.year, date.month, date.day
         if skip > 1
           offset = months_since_schedule_start(@year, @month)
-          add_to_months offset % skip
+          remainder = offset % skip
+          if remainder > 0
+            add_to_months remainder
+            seed_day = first_day_of_month
+          end
         end
         
         get_context
         
-        @position = cycle.index { |day| day >= date.day }
+        @position = cycle.index { |day| day >= seed_day }
         next_month unless @position
         
         day = cycle[@position]
@@ -70,15 +74,20 @@ module Hiccup
       end
       
       def first_occurrence_on_or_before(date)
-        @year, @month = date.year, date.month
+        @year, @month, seed_day = date.year, date.month, date.day
         if skip > 1
           offset = months_since_schedule_start(@year, @month)
-          subtract_from_months offset % skip
+          remainder = offset % skip
+          if remainder > 0
+            subtract_from_months remainder
+            get_context # figure out last_day_of_month
+            seed_day = last_day_of_month
+          end
         end
         
         get_context
         
-        @position = cycle.rindex { |day| day <= date.day }
+        @position = cycle.rindex { |day| day <= seed_day }
         prev_month unless @position
         
         day = cycle[@position]
@@ -141,6 +150,10 @@ module Hiccup
       
       def months_since_schedule_start(year, month)
         (year - start_date.year) * 12 + (month - start_date.month)
+      end
+      
+      def first_day_of_month
+        1
       end
       
       

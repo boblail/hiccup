@@ -43,17 +43,27 @@ class MonthlyEnumeratorTest < ActiveSupport::TestCase
         start_date: Date.new(2015, 1, 1))
     end
     
-    context "when enumerating from the start date" do
-      should "skip months from the schedule's start date" do
-        assert_equal [Date.new(2015, 1, 1), Date.new(2015, 3, 5), Date.new(2015, 5, 7)],
-                     @schedule.occurrences_between(Date.new(2015, 1, 1), Date.new(2015, 5, 31))
+    context "when enumerating from a date in a skipped month" do
+      should "skip months from the schedule's start date not from the offset" do
+        date = Date.new(2015, 2, 1)
+        enumerator = @schedule.enumerator.new(@schedule, date)
+        assert_equal Date.new(2015, 3, 5), enumerator.next
       end
     end
     
-    context "when enumerating from an offset" do
-      should "skip months from the schedule's start date not from the offset" do
-        assert_equal [Date.new(2015, 3, 5), Date.new(2015, 5, 7)],
-                     @schedule.occurrences_between(Date.new(2015, 2, 1), Date.new(2015, 6, 30))
+    context "when enumerating forward from a date toward the end of a skipped month" do
+      should "find the first date from the start of an unskipped month" do
+        date = Date.new(2015, 4, 30)
+        enumerator = @schedule.enumerator.new(@schedule, date)
+        assert_equal Date.new(2015, 5, 7), enumerator.next
+      end
+    end
+    
+    context "when enumerating backward from a date toward the beginning of a skipped month" do
+      should "find the first date from the end of an unskipped month" do
+        date = Date.new(2015, 6, 1)
+        enumerator = @schedule.enumerator.new(@schedule, date)
+        assert_equal Date.new(2015, 5, 7), enumerator.prev
       end
     end
   end
