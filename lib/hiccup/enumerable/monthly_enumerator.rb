@@ -52,6 +52,11 @@ module Hiccup
       
       def first_occurrence_on_or_after(date)
         @year, @month = date.year, date.month
+        if skip > 1
+          offset = months_since_schedule_start(@year, @month)
+          add_to_months offset % skip
+        end
+        
         get_context
         
         @position = cycle.index { |day| day >= date.day }
@@ -66,6 +71,11 @@ module Hiccup
       
       def first_occurrence_on_or_before(date)
         @year, @month = date.year, date.month
+        if skip > 1
+          offset = months_since_schedule_start(@year, @month)
+          subtract_from_months offset % skip
+        end
+        
         get_context
         
         @position = cycle.rindex { |day| day <= date.day }
@@ -127,6 +137,11 @@ module Hiccup
         @cycle = occurrences_in_month(year, month).sort
       end
       
+      
+      
+      def months_since_schedule_start(year, month)
+        (year - start_date.year) * 12 + (month - start_date.month)
+      end
       
       
     end
