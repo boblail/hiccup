@@ -101,16 +101,24 @@ module Hiccup
       
       def next_month
         @position = 0
-        @month += skip
-        @year, @month = year + 1, month - 12 if month > 12
+        add_to_months skip
         get_context
+      end
+      
+      def add_to_months(offset)
+        @month += offset
+        @year, @month = @year + 1, @month - 12 while @month > 12
       end
       
       def prev_month
         @position = @cycle.length - 1
-        @month -= skip
-        @year, @month = year - 1, month + 12 if month < 1
+        subtract_from_months skip
         get_context
+      end
+      
+      def subtract_from_months(offset)
+        @month -= offset
+        @year, @month = @year - 1, @month + 12 while @month < 1
       end
       
       def get_context
