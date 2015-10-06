@@ -5,7 +5,9 @@ module Hiccup
     class MonthlyEnumerator < ScheduleEnumerator
       
       def self.for(schedule)
-        if schedule.monthly_pattern.all? { |occurrence| Fixnum === occurrence }
+        if schedule.monthly_pattern.empty?
+          NeverEnumerator
+        elsif schedule.monthly_pattern.all? { |occurrence| Fixnum === occurrence }
           MonthlyDateEnumerator
         else
           self

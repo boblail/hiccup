@@ -69,4 +69,21 @@ class MonthlyEnumeratorTest < ActiveSupport::TestCase
   end
   
   
+  context "with an empty schedule" do
+    setup do
+      @schedule = Schedule.new(
+        kind: :monthly,
+        skip: 2,
+        monthly_pattern: [],
+        start_date: Date.new(2015, 1, 1))
+    end
+    
+    should "always return nil" do
+      date = Date.new(2015, 2, 1)
+      enumerator = @schedule.enumerator.new(@schedule, date)
+      assert_equal nil, enumerator.next
+    end
+  end
+  
+  
 end
