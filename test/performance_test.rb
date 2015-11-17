@@ -3,8 +3,8 @@ require "benchmark"
 
 class PerformanceTest < ActiveSupport::TestCase
   include Hiccup
-  
-  
+
+
   { 100 => 50,
     500 => 50,
    1000 => 50 }.each do |number, expected_duration|
@@ -16,11 +16,11 @@ class PerformanceTest < ActiveSupport::TestCase
       assert duration <= expected_duration, "It took %.2fms" % duration
     end
   end
-  
-  
+
+
   # Inferring 500 dates still takes 10 seconds.
   # It spends 7.3 of those seconds predicting dates,
-  # 6.9 of those predicting monthly or weekly dates. 
+  # 6.9 of those predicting monthly or weekly dates.
   { 10 =>  0.1.seconds,
     50 =>  0.5.seconds,
    100 =>  1.0.seconds }.each do |number, expected_duration|
@@ -30,6 +30,6 @@ class PerformanceTest < ActiveSupport::TestCase
       assert duration <= expected_duration, "It took %.2f seconds" % duration
     end
   end
-  
-  
+
+
 end

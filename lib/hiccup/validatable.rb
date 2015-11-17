@@ -6,18 +6,18 @@ module Hiccup
   module Validatable
     include Convenience
     extend ActiveSupport::Concern
-    
-    
+
+
     # !todo: use ActiveModel:Validation rather than a custom method
     included do
       validates :skip, numericality: {greater_than: 0}
       validate                    :validate_recurrence
     end
-    
-    
+
+
   private
-    
-    
+
+
     # !todo: use i18n to let clients of this library supply their own wording
     def validate_recurrence
       case kind
@@ -27,7 +27,7 @@ module Hiccup
       when :annually;
       else;             invalid_kind!
       end
-      
+
       errors.add :start_date, "is a #{start_date.class} not a Date" unless start_date.is_a?(Date)
       if ends?
         if end_date.is_a?(Date)
@@ -37,8 +37,8 @@ module Hiccup
         end
       end
     end
-    
-    
+
+
     def validate_weekly_recurrence
       if !weekly_pattern.is_a?(Array)
         errors.add(:weekly_pattern, "is a #{weekly_pattern.class}. It should be an array")
@@ -48,8 +48,8 @@ module Hiccup
         errors.add(:weekly_pattern, "should contain only weekdays. (#{invalid_names.to_sentence} are invalid)")
       end
     end
-    
-    
+
+
     def validate_monthly_recurrence
       if !monthly_pattern.is_a?(Array)
         errors.add(:monthly_pattern, "is a #{monthly_pattern.class}. It should be an array")
@@ -59,12 +59,12 @@ module Hiccup
         errors.add(:monthly_pattern, "contains invalid monthly occurrences")
       end
     end
-    
-    
+
+
     def invalid_occurrence?(occurrence)
       !valid_occurrence?(occurrence)
     end
-    
+
     def valid_occurrence?(occurrence)
       if occurrence.is_a?(Array)
         i, wd = occurrence
@@ -74,26 +74,26 @@ module Hiccup
         i.is_a?(Fixnum) && (1..31).include?(i)
       end
     end
-    
-    
+
+
     def invalid_kind!
       errors.add(:kind, "#{kind.inspect} is not recognized. It must be one of #{Kinds.collect{|kind| ":#{kind}"}.to_sentence(:two_words_connector => " or ", :last_word_connector => ", or ")}.")
     end
-    
-    
+
+
     # def valid_occurrence?(occurrence)
     #   if occurrence.is_a?(Array)
     #     ordinal, kind = occurrence
-    #     
+    #
     #     errors.add(:kind, "is not a valid monthly occurrence kind") unless Date::DAYNAMES.member?(kind)
     #     if ordinal.is_a?(Fixnum)
-    #       errors.add(:ordinal, "is not a valid integer") unless (ordinal==-1) or (1..6).include?(ordinal)        
+    #       errors.add(:ordinal, "is not a valid integer") unless (ordinal==-1) or (1..6).include?(ordinal)
     #     else
     #       errors.add(:ordinal, "is not an integer")
     #     end
     #   else
     #     ordinal = occurrence
-    #     
+    #
     #     if ordinal.is_a?(Fixnum)
     #       errors.add(:ordinal, "is not an integer between 1 and 31") unless (1..31).include?(ordinal)
     #     else
@@ -101,7 +101,7 @@ module Hiccup
     #     end
     #   end
     # end
-    
-    
+
+
   end
 end

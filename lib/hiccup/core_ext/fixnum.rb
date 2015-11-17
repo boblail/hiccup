@@ -1,5 +1,5 @@
 class Fixnum
-  
+
   # todo: complete
   def human_ordinalize(map={})
     map.key?(self) ? map[self] : (begin
@@ -33,5 +33,5 @@ class Fixnum
       end
     end)
   end
-  
+
 end

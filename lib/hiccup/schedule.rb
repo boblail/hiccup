@@ -6,15 +6,15 @@ module Hiccup
   class Schedule
     extend Hiccup
     include ActiveModel::Validations
-    
-    
+
+
     hiccup :enumerable,
            :validatable,
            :humanizable,
            :inferable,
            :serializable => [:ical]
-    
-    
+
+
     def initialize(options={})
       @kind             =(options[:kind] || :never).to_sym
       @start_date       =(options[:start_date] || Date.today).to_date
@@ -24,11 +24,11 @@ module Hiccup
       @weekly_pattern   = options[:weekly_pattern] || []
       @monthly_pattern  = options[:monthly_pattern] || []
     end
-    
-    
+
+
     attr_accessor :kind, :start_date, :ends, :end_date, :skip, :weekly_pattern, :monthly_pattern
-    
-    
+
+
     def to_hash
       {
         :kind => kind,
@@ -39,7 +39,7 @@ module Hiccup
         :monthly_pattern => monthly_pattern
       }
     end
-    
-    
+
+
   end
 end

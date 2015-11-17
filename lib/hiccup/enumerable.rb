@@ -7,15 +7,15 @@ require "hiccup/enumerable/weekly_enumerator"
 
 module Hiccup
   module Enumerable
-    
-    
-    
+
+
+
     def enumerator
       ScheduleEnumerator.enum_for(self)
     end
-    
-    
-    
+
+
+
     def occurrences_between(earlier_date, later_date)
       occurrences = []
       enum = enumerator.new(self, earlier_date)
@@ -24,30 +24,30 @@ module Hiccup
       end
       occurrences
     end
-    
-    
-    
+
+
+
     def first_occurrence_on_or_after(date)
       enumerator.new(self, date).next
     end
-    
+
     def first_occurrence_after(date)
       first_occurrence_on_or_after(date.to_date + 1)
     end
     alias :next_occurrence_after :first_occurrence_after
-    
-    
-    
+
+
+
     def first_occurrence_on_or_before(date)
       enumerator.new(self, date).prev
     end
-    
+
     def first_occurrence_before(date)
       first_occurrence_on_or_before(date.to_date - 1)
     end
-    
-    
-    
+
+
+
     def occurs_on(date)
       date = date.to_date
       date == first_occurrence_on_or_after(date)
@@ -56,13 +56,13 @@ module Hiccup
     alias :includes? :occurs_on
     alias :member? :occurs_on
     alias :predicts? :occurs_on
-    
-    
-    
+
+
+
     def n_occurrences_before(limit, date, options={})
       n_occurrences_on_or_before(limit, date.to_date - 1, options)
     end
-    
+
     def n_occurrences_on_or_before(limit, date, options={})
       exceptions = options.fetch(:except, [])
       occurrences = []
@@ -72,17 +72,17 @@ module Hiccup
       end
       occurrences
     end
-    
-    
-    
+
+
+
     def first_n_occurrences(limit, options={})
       n_occurrences_on_or_after(limit, start_date, options)
     end
-    
+
     def n_occurrences_after(limit, date, options={})
       n_occurrences_on_or_after(limit, date.to_date + 1, options)
     end
-    
+
     def n_occurrences_on_or_after(limit, date, options={})
       exceptions = options.fetch(:except, [])
       occurrences = []
@@ -92,8 +92,8 @@ module Hiccup
       end
       occurrences
     end
-    
-    
-    
+
+
+
   end
 end

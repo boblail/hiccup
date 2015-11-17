@@ -22,7 +22,7 @@ require "hiccup/version"
 #   monthly recurrence
 #
 #   Examples:
-#    
+#
 #    Every other Monday
 #    :kind => :weekly, :weekly_pattern => ["Monday"]
 #
@@ -34,45 +34,45 @@ require "hiccup/version"
 #
 #
 module Hiccup
-  
-  
+
+
   Kinds = [:never, :weekly, :monthly, :annually]
-  
-  
+
+
   def hiccup(*modules)
     options = modules.extract_options!
     add_hiccup_modules(modules)
     add_hiccup_serialization_formats(options[:serializable])
   end
-  
-  
+
+
 private
-  
-  
+
+
   def add_hiccup_modules(modules)
     (modules||[]).each {|name| add_hiccup_module(name)}
   end
-  
+
   def add_hiccup_module(symbol)
     include_hiccup_module "hiccup/#{symbol}"
   end
-  
-  
+
+
   def add_hiccup_serialization_formats(formats)
     (formats||[]).each {|format| add_hiccup_serialization_format(format)}
   end
-  
+
   def add_hiccup_serialization_format(format)
     include_hiccup_module "hiccup/serializable/#{format}"
   end
-  
-  
+
+
   def include_hiccup_module(module_path)
     require module_path
     include module_path.classify.constantize
   end
-  
-  
+
+
 end
 
 

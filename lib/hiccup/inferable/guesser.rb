@@ -3,22 +3,22 @@ require 'hiccup/inferable/scorer'
 module Hiccup
   module Inferable
     class Guesser
-      
+
       def initialize(klass, options={})
         @klass = klass
         @verbose = options.fetch(:verbose, false)
         @allow_skips = options.fetch(:allow_skips, true)
         @max_complexity = options.fetch(:max_complexity, 3)
       end
-      
+
       attr_reader :max_complexity
-      
+
       def allow_skips?
         @allow_skips
       end
-      
-      
-      
+
+
+
       def generate_guesses(dates)
         @start_date = dates.first
         @end_date = dates.last
@@ -28,7 +28,7 @@ module Hiccup
           guesses.concat generate_weekly_guesses(dates)
         end
       end
-      
+
       def generate_yearly_guesses(dates)
         histogram_of_patterns = dates.to_histogram do |date|
           [date.month, date.day]
@@ -37,7 +37,7 @@ module Hiccup
         highest_popularity = patterns_by_popularity.keys.max # => 5
         most_popular = patterns_by_popularity[highest_popularity].first # => a
         start_date = Date.new(@start_date.year, *most_popular)
-        
+
         [].tap do |guesses|
           skip_range.each do |skip|
             guesses << @klass.new.tap do |schedule|
@@ -49,16 +49,16 @@ module Hiccup
           end
         end
       end
-      
+
       def generate_monthly_guesses(dates)
         histogram_of_patterns = dates.to_histogram do |date|
           [date.get_nth_wday_of_month, Date::DAYNAMES[date.wday]]
         end
         patterns_by_popularity = histogram_of_patterns.flip
-        
+
         histogram_of_days = dates.to_histogram(&:day)
         days_by_popularity = histogram_of_days.flip
-        
+
         if @verbose
           puts "",
                "  monthly analysis:",
@@ -68,7 +68,7 @@ module Hiccup
                "    histogram (day): #{histogram_of_days.inspect}",
                "    by_popularity (day): #{days_by_popularity.inspect}"
         end
-        
+
         [].tap do |guesses|
           skip_range.each do |skip|
             enumerate_by_popularity(days_by_popularity) do |days|
@@ -81,7 +81,7 @@ module Hiccup
                 schedule.monthly_pattern = days
               end
             end
-            
+
             enumerate_by_popularity(patterns_by_popularity) do |patterns|
               next if patterns.length > max_complexity
               guesses << @klass.new.tap do |schedule|
@@ -95,14 +95,14 @@ module Hiccup
           end
         end
       end
-      
+
       def generate_weekly_guesses(dates)
         [].tap do |guesses|
           histogram_of_wdays = dates.to_histogram do |date|
             Date::DAYNAMES[date.wday]
           end
           wdays_by_popularity = histogram_of_wdays.flip
-          
+
           if @verbose
             puts "",
                  "  weekly analysis:",
@@ -110,7 +110,7 @@ module Hiccup
                  "    histogram: #{histogram_of_wdays.inspect}",
                  "    by_popularity: #{wdays_by_popularity.inspect}"
           end
-          
+
           skip_range.each do |skip|
             enumerate_by_popularity(wdays_by_popularity) do |wdays|
               next if wdays.length > max_complexity
@@ -125,14 +125,14 @@ module Hiccup
           end
         end
       end
-      
+
       def skip_range
         return 1..1 unless allow_skips?
         1...5
       end
-      
-      
-      
+
+
+
       # Expects a hash of values grouped by popularity
       # Yields the most popular values first, and then
       # increasingly less popular values
@@ -143,7 +143,7 @@ module Hiccup
           yield values_by_popularity.values_at(*at_popularities).flatten(1)
         end
       end
-      
+
     end
   end
 end
