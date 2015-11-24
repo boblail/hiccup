@@ -3,6 +3,7 @@ require "hiccup/enumerable/annually_enumerator"
 require "hiccup/enumerable/monthly_enumerator"
 require "hiccup/enumerable/never_enumerator"
 require "hiccup/enumerable/weekly_enumerator"
+require "hiccup/errors"
 
 
 module Hiccup
@@ -12,6 +13,19 @@ module Hiccup
 
     def enumerator
       ScheduleEnumerator.enum_for(self)
+    end
+
+
+
+    def to_a
+      raise UnboundedEnumerationError, "This schedule does not have an end date and so cannot be asked to list all of its dates, ever" unless ends?
+
+      occurrences = []
+      enum = enumerator.new(self, start_date)
+      while occurrence = enum.next
+        occurrences << occurrence
+      end
+      occurrences
     end
 
 
