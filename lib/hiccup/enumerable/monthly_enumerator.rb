@@ -102,15 +102,21 @@ module Hiccup
 
 
       def occurrences_in_month(year, month)
-        wday_of_first_of_month = Date.new(year, month, 1).wday
         monthly_pattern.map do |occurrence|
           if occurrence.is_a?(Array)
             ordinal, weekday = occurrence
             wday = Date::DAYNAMES.index(weekday)
             day = wday
-            day = day + 7 if (wday < wday_of_first_of_month)
-            day = day - wday_of_first_of_month
-            day = day + (ordinal * 7) - 6
+            if ordinal < 0
+              wday_of_last_of_month = Date.new(year, month, -1).wday
+              day = day + 7 if wday <= wday_of_last_of_month
+              day = day - wday_of_last_of_month + (ordinal * 7) - 1
+            else
+              wday_of_first_of_month = Date.new(year, month, 1).wday
+              day = day + 7 if (wday < wday_of_first_of_month)
+              day = day - wday_of_first_of_month
+              day = day + (ordinal * 7) - 6
+            end
             day
           else
             occurrence

@@ -69,6 +69,65 @@ class MonthlyEnumeratorTest < ActiveSupport::TestCase
   end
 
 
+  context "last of the month" do
+    should "return the last day of the month" do
+      date = Date.new(2014, 12, 31)
+      @schedule = Schedule.new(
+        kind: :monthly,
+        monthly_pattern: [-1],
+        start_date: date
+      )
+      enumerator = @schedule.enumerator.new(@schedule, date)
+      assert_equal Date.new(2015, 1, 31), enumerator.next
+      assert_equal Date.new(2015, 2, 28), enumerator.next
+      assert_equal Date.new(2015, 3, 31), enumerator.next
+    end
+
+    should "return the last sunday of the month" do
+      date = Date.new(2014, 12, 31)
+      @schedule = Schedule.new(
+        kind: :monthly,
+        monthly_pattern: [[-1, "Sunday"]],
+        start_date: date
+      )
+      enumerator = @schedule.enumerator.new(@schedule, date)
+      assert_equal Date.new(2015, 1, 25), enumerator.next
+    end
+
+    should "return the last monday of the month" do
+      date = Date.new(2014, 12, 31)
+      @schedule = Schedule.new(
+        kind: :monthly,
+        monthly_pattern: [[-1, "Monday"]],
+        start_date: date
+      )
+      enumerator = @schedule.enumerator.new(@schedule, Date.new(2015, 2, 28))
+      assert_equal Date.new(2015, 3, 30), enumerator.next
+    end
+
+    should "return the last tuesday of the month" do
+      date = Date.new(2014, 12, 31)
+      @schedule = Schedule.new(
+        kind: :monthly,
+        monthly_pattern: [[-1, "Tuesday"]],
+        start_date: date
+      )
+      enumerator = @schedule.enumerator.new(@schedule, Date.new(2015, 1, 31))
+      assert_equal Date.new(2015, 2, 24), enumerator.next
+    end
+
+    should "return the second to last tuesday of the month" do
+      date = Date.new(2014, 12, 31)
+      @schedule = Schedule.new(
+        kind: :monthly,
+        monthly_pattern: [[-2, "Tuesday"]],
+        start_date: date
+      )
+      enumerator = @schedule.enumerator.new(@schedule, Date.new(2015, 2, 28))
+      assert_equal Date.new(2015, 2, 17), enumerator.prev
+    end
+  end
+
   context "with an empty schedule" do
     setup do
       @schedule = Schedule.new(
