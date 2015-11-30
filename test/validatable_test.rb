@@ -51,12 +51,21 @@ class ValidatableTest < ActiveSupport::TestCase
 
 
 
-  def test_valid_monthly_recurrence
-    recurrence = Schedule.new(:kind => :monthly, :monthly_pattern => [2])
-    assert_valid(recurrence)
+  context "monthly_pattern" do
+    should "be valid when it's an array of week index, day name" do
+      recurrence = Schedule.new(:kind => :monthly, :monthly_pattern => [[2, "Thursday"]])
+      assert_valid(recurrence)
+    end
 
-    recurrence = Schedule.new(:kind => :monthly, :monthly_pattern => [[2, "Thursday"]])
-    assert_valid(recurrence)
+    should "be valid when it's a positive integer between 1-31" do
+      recurrence = Schedule.new(:kind => :monthly, :monthly_pattern => [2])
+      assert_valid(recurrence)
+    end
+
+    should "be valid when it's a -1 (last day of the month)" do
+      recurrence = Schedule.new(:kind => :monthly, :monthly_pattern => [-1])
+      assert_valid(recurrence)
+    end
   end
 
 
