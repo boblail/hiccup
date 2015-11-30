@@ -71,7 +71,7 @@ module Hiccup
         Date::DAYNAMES.member?(wd) && i.is_a?(Fixnum) && ((i == -1) || (1..6).include?(i))
       else
         i = occurrence
-        i.is_a?(Fixnum) && (1..31).include?(i)
+        i.is_a?(Fixnum) && ([-1] + (1..31).to_a).include?(i)
       end
     end
 
