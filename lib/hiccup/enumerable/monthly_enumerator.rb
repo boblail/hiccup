@@ -110,7 +110,8 @@ module Hiccup
             if ordinal < 0
               wday_of_last_of_month = Date.new(year, month, -1).wday
               day = day + 7 if wday <= wday_of_last_of_month
-              day = day - wday_of_last_of_month + (ordinal * 7) - 1
+              day = day - wday_of_last_of_month + (ordinal * 7)
+              day = last_day_of_month + day
             else
               wday_of_first_of_month = Date.new(year, month, 1).wday
               day = day + 7 if (wday < wday_of_first_of_month)
@@ -119,7 +120,7 @@ module Hiccup
             end
             day
           else
-            occurrence
+            coerce_day_to_positive(occurrence)
           end
         end
       end
@@ -164,6 +165,12 @@ module Hiccup
         1
       end
 
+
+      def coerce_day_to_positive(index)
+        # Converts e.g. -1 (last day of the month) to 31
+        return index if index > 0
+        last_day_of_month + index + 1
+      end
 
     end
   end

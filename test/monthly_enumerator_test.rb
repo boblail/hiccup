@@ -71,16 +71,15 @@ class MonthlyEnumeratorTest < ActiveSupport::TestCase
 
   context "last of the month" do
     should "return the last day of the month" do
-      date = Date.new(2014, 12, 31)
+      date = Date.new(2014, 12, 30)
       @schedule = Schedule.new(
         kind: :monthly,
         monthly_pattern: [-1],
         start_date: date
       )
       enumerator = @schedule.enumerator.new(@schedule, date)
+      assert_equal Date.new(2014, 12, 31), enumerator.next
       assert_equal Date.new(2015, 1, 31), enumerator.next
-      assert_equal Date.new(2015, 2, 28), enumerator.next
-      assert_equal Date.new(2015, 3, 31), enumerator.next
     end
 
     should "return the last sunday of the month" do
@@ -125,6 +124,27 @@ class MonthlyEnumeratorTest < ActiveSupport::TestCase
       )
       enumerator = @schedule.enumerator.new(@schedule, Date.new(2015, 2, 28))
       assert_equal Date.new(2015, 2, 17), enumerator.prev
+    end
+
+    should "find the correct occurence on or after a date in the same month" do
+      date = Date.new(2016, 1, 1)
+      @schedule = Schedule.new(
+        kind: :monthly,
+        monthly_pattern: [[-1, "Sunday"]],
+        start_date: date
+      )
+      enumerator = @schedule.enumerator.new(@schedule, date)
+      assert_equal Date.new(2016, 1, 31), enumerator.next
+    end
+
+    should "find the correct occurence on or before a date in a subsequent month" do
+      @schedule = Schedule.new(
+        kind: :monthly,
+        monthly_pattern: [[-1, "Friday"]],
+        start_date: Date.new(2016, 1, 1)
+      )
+      enumerator = @schedule.enumerator.new(@schedule, Date.new(2016, 2, 1))
+      assert_equal Date.new(2016, 1, 29), enumerator.prev
     end
   end
 
