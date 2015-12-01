@@ -6,7 +6,7 @@ module Hiccup
     protected
 
       def occurrences_in_month(year, month)
-        monthly_pattern
+        monthly_pattern.map(&method(:coerce_day_to_positive))
       end
 
     end
