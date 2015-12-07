@@ -9,7 +9,7 @@ module Hiccup
 
         @wday_pattern = weekly_pattern.map do |weekday|
           Date::DAYNAMES.index(weekday)
-        end.sort
+        end.sort.uniq
 
         if @wday_pattern.empty?
           @base_date = start_date

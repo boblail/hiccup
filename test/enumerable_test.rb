@@ -460,6 +460,49 @@ class EnumerableTest < ActiveSupport::TestCase
 
 
 
+  context "Duplication:" do
+    context "A weekly schedule that lists the same day twice" do
+      setup do
+        @schedule = Schedule.new(
+          kind: :weekly,
+          start_date: Date.new(2015, 1, 1),
+          weekly_pattern: %w{Monday Monday})
+      end
+
+      should "not enumerate that date more than once" do
+        assert_equal [5, 12, 19, 26], occurrences_during_month(schedule, 2015, 1).map(&:day)
+      end
+    end
+
+    context "A monthly (by-weekday) schedule that lists the same day twice" do
+      setup do
+        @schedule = Schedule.new(
+          kind: :monthly,
+          start_date: Date.new(2015, 1, 1),
+          monthly_pattern: [[3, "Monday"], [3, "Monday"]])
+      end
+
+      should "not enumerate that date more than once" do
+        assert_equal [19], occurrences_during_month(schedule, 2015, 1).map(&:day)
+      end
+    end
+
+    context "A monthly (by-day) schedule that lists the same day twice" do
+      setup do
+        @schedule = Schedule.new(
+          kind: :monthly,
+          start_date: Date.new(2015, 1, 1),
+          monthly_pattern: [3, 5])
+      end
+
+      should "not enumerate that date more than once" do
+        assert_equal [3, 5], occurrences_during_month(schedule, 2015, 1).map(&:day)
+      end
+    end
+  end
+
+
+
   if ENV['PERFORMANCE_TEST']
     test "performance test" do
       n = 1000

@@ -122,7 +122,7 @@ module Hiccup
           else
             coerce_day_to_positive(occurrence)
           end
-        end
+        end.uniq
       end
 
 
