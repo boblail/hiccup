@@ -492,11 +492,11 @@ class EnumerableTest < ActiveSupport::TestCase
         @schedule = Schedule.new(
           kind: :monthly,
           start_date: Date.new(2015, 1, 1),
-          monthly_pattern: [3, 5])
+          monthly_pattern: [3, 3])
       end
 
       should "not enumerate that date more than once" do
-        assert_equal [3, 5], occurrences_during_month(schedule, 2015, 1).map(&:day)
+        assert_equal [3], occurrences_during_month(schedule, 2015, 1).map(&:day)
       end
     end
   end
