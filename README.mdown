@@ -1,7 +1,8 @@
 # Hiccup
 
-[![Build Status](https://travis-ci.org/boblail/hiccup.png?branch=master)](https://travis-ci.org/boblail/hiccup)
-[![Code Climate](https://codeclimate.com/github/boblail/hiccup.png)](https://codeclimate.com/github/boblail/hiccup)
+[![Gem Version](https://badge.fury.io/rb/hiccup.svg)](https://rubygems.org/gems/hiccup)
+[![Code Climate](https://codeclimate.com/github/boblail/hiccup.svg)](https://codeclimate.com/github/boblail/hiccup)
+[![Build Status](https://travis-ci.org/boblail/hiccup.svg)](https://travis-ci.org/boblail/hiccup)
 
 Hiccup mixes a-la-cart recurrence features into your recurring model. It doesn't dictate the data structure of your model, just the interface. It works like Devise does for authenticatable models.
 
