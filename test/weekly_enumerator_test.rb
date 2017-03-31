@@ -6,13 +6,13 @@ class WeeklyEnumeratorTest < ActiveSupport::TestCase
 
 
 
-  test "should generate a cycle of [7] for something that occurs every week on one day" do
+  should "generate a cycle of [7] for something that occurs every week on one day" do
     assert_equal [7], cycle_for(
       :start_date => Date.new(2013, 9, 23),
       :weekly_pattern => ["Monday"])
   end
 
-  test "should generate a cycle of [21] for something that occurs every _third_ week on one day" do
+  should "generate a cycle of [21] for something that occurs every _third_ week on one day" do
     assert_equal [21], cycle_for(
       :start_date => Date.new(2013, 9, 23),
       :weekly_pattern => ["Monday"],
@@ -21,14 +21,14 @@ class WeeklyEnumeratorTest < ActiveSupport::TestCase
 
 
 
-  test "should generate a cycle of [6, 8] for something that occurs every other Saturday and Sunday when the start date is a Sunday" do
+  should "generate a cycle of [6, 8] for something that occurs every other Saturday and Sunday when the start date is a Sunday" do
     assert_equal [6, 8], cycle_for(
       :start_date => Date.new(2013, 9, 22),
       :weekly_pattern => ["Saturday", "Sunday"],
       :skip => 2)
   end
 
-  test "should generate a cycle of [8, 6] for something that occurs every other Saturday and Sunday when the start date is a Saturday" do
+  should "generate a cycle of [8, 6] for something that occurs every other Saturday and Sunday when the start date is a Saturday" do
     assert_equal [8, 6], cycle_for(
       :start_date => Date.new(2013, 9, 28),
       :weekly_pattern => ["Saturday", "Sunday"],
@@ -37,21 +37,21 @@ class WeeklyEnumeratorTest < ActiveSupport::TestCase
 
 
 
-  test "should generate a cycle of [2, 2, 10] for something that occurs every other Monday, Wednesday, Friday when the start date is a Monday" do
+  should "generate a cycle of [2, 2, 10] for something that occurs every other Monday, Wednesday, Friday when the start date is a Monday" do
     assert_equal [2, 2, 10], cycle_for(
       :start_date => Date.new(2013, 9, 23),
       :weekly_pattern => ["Monday", "Wednesday", "Friday"],
       :skip => 2)
   end
 
-  test "should generate a cycle of [2, 10, 2] for something that occurs every other Monday, Wednesday, Friday when the start date is a Wednesday" do
+  should "generate a cycle of [2, 10, 2] for something that occurs every other Monday, Wednesday, Friday when the start date is a Wednesday" do
     assert_equal [2, 10, 2], cycle_for(
       :start_date => Date.new(2013, 9, 25),
       :weekly_pattern => ["Monday", "Wednesday", "Friday"],
       :skip => 2)
   end
 
-  test "should generate a cycle of [10, 2, 2] for something that occurs every other Monday, Wednesday, Friday when the start date is a Friday" do
+  should "generate a cycle of [10, 2, 2] for something that occurs every other Monday, Wednesday, Friday when the start date is a Friday" do
     assert_equal [10, 2, 2], cycle_for(
       :start_date => Date.new(2013, 9, 27),
       :weekly_pattern => ["Monday", "Wednesday", "Friday"],
@@ -60,7 +60,7 @@ class WeeklyEnumeratorTest < ActiveSupport::TestCase
 
 
 
-  test "should generate a cycle of [2, 5] for something that occurs every Tuesday and Thursday when the start date is a Friday" do
+  should "generate a cycle of [2, 5] for something that occurs every Tuesday and Thursday when the start date is a Friday" do
     assert_equal [2, 5], cycle_for(
       :start_date => Date.new(2013, 9, 27),
       :weekly_pattern => ["Tuesday", "Thursday"])

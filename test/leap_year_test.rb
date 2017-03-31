@@ -6,7 +6,7 @@ class LeapYearTest < ActiveSupport::TestCase
 
 
 
-  test "should correctly determine whether a year is a leap year or not" do
+  should "correctly determine whether a year is a leap year or not" do
     enum = Enumerable::ScheduleEnumerator.new(Schedule.new, Date.today)
 
     assert enum.send(:leap_year?, 1988), "1988 is a leap year"

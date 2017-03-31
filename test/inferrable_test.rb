@@ -8,7 +8,7 @@ class InferableTest < ActiveSupport::TestCase
 
 
 
-  test "should raise an error if not given an array of dates" do
+  should "raise an error if not given an array of dates" do
     assert_raises ArgumentError do
       Schedule.infer(["what's this?"])
     end
@@ -30,7 +30,7 @@ class InferableTest < ActiveSupport::TestCase
 
 
 
-  test "should prefer guesses that predict too many results over guesses that predict too few" do
+  should "prefer guesses that predict too many results over guesses that predict too few" do
 
     # In this stream of dates, we could guess an annual recurrence on 1/15
     # or a monthly recurrence on the 15th.
@@ -56,7 +56,7 @@ class InferableTest < ActiveSupport::TestCase
 
   # Infers annual schedules
 
-  test "should infer an annual" do
+  should "infer an annual" do
     dates = %w{2010-3-4 2011-3-4 2012-3-4}
     schedules = Schedule.infer(dates)
     assert_equal ["Every year on March 4"], schedules.map(&:humanize)
@@ -65,7 +65,7 @@ class InferableTest < ActiveSupport::TestCase
 
   # ... with skips
 
-  test "should infer a schedule that occurs every other year" do
+  should "infer a schedule that occurs every other year" do
     dates = %w{2010-3-4 2012-3-4 2014-3-4}
     schedules = Schedule.infer(dates)
     assert_equal ["Every other year on March 4"], schedules.map(&:humanize)
@@ -73,13 +73,13 @@ class InferableTest < ActiveSupport::TestCase
 
   # ... where some of the input is wrong
 
-  test "should infer a yearly schedule when one of the dates was rescheduled" do
+  should "infer a yearly schedule when one of the dates was rescheduled" do
     dates = %w{2010-3-4 2011-9-15 2012-3-4 2013-3-4}
     schedules = Schedule.infer(dates)
     assert_equal ["Every year on March 4"], schedules.map(&:humanize)
   end
 
-  test "should infer a yearly schedule when the first date was rescheduled" do
+  should "infer a yearly schedule when the first date was rescheduled" do
     dates = %w{2010-3-6 2011-3-4 2012-3-4 2013-3-4}
     schedules = Schedule.infer(dates)
     assert_equal ["Every year on March 4"], schedules.map(&:humanize)
@@ -91,7 +91,7 @@ class InferableTest < ActiveSupport::TestCase
 
   # Infers monthly schedules
 
-  test "should infer a monthly schedule that occurs on a date" do
+  should "infer a monthly schedule that occurs on a date" do
     dates = %w{2012-2-4 2012-3-4 2012-4-4}
     schedules = Schedule.infer(dates)
     assert_equal ["The 4th of every month"], schedules.map(&:humanize)
@@ -101,13 +101,13 @@ class InferableTest < ActiveSupport::TestCase
     assert_equal ["The 17th of every month"], schedules.map(&:humanize)
   end
 
-  test "should infer a monthly schedule that occurs on a weekday" do
+  should "infer a monthly schedule that occurs on a weekday" do
     dates = %w{2012-7-9 2012-8-13 2012-9-10}
     schedules = Schedule.infer(dates)
     assert_equal ["The second Monday of every month"], schedules.map(&:humanize)
   end
 
-  test "should infer a schedule that occurs several times a month" do
+  should "infer a schedule that occurs several times a month" do
     dates = %w{2012-7-9 2012-7-23 2012-8-13 2012-8-27 2012-9-10 2012-9-24}
     schedules = Schedule.infer(dates)
     assert_equal ["The second Monday and fourth Monday of every month"], schedules.map(&:humanize)
@@ -116,7 +116,7 @@ class InferableTest < ActiveSupport::TestCase
 
   # ... with skips
 
-  test "should infer a schedule that occurs every third month" do
+  should "infer a schedule that occurs every third month" do
     dates = %w{2012-2-4 2012-5-4 2012-8-4}
     schedules = Schedule.infer(dates)
     assert_equal ["The 4th of every third month"], schedules.map(&:humanize)
@@ -125,32 +125,32 @@ class InferableTest < ActiveSupport::TestCase
 
   # ... when some dates are wrong in the input group
 
-  test "should infer a monthly (by day) schedule when one day was rescheduled" do
+  should "infer a monthly (by day) schedule when one day was rescheduled" do
     dates = %w{2012-10-02 2012-11-02 2012-12-03}
     schedules = Schedule.infer(dates)
     assert_equal ["The 2nd of every month"], schedules.map(&:humanize)
   end
 
-  test "should infer a monthly (by day) schedule when the first day was rescheduled" do
+  should "infer a monthly (by day) schedule when the first day was rescheduled" do
     dates = %w{2012-10-03 2012-11-02 2012-12-02}
     schedules = Schedule.infer(dates)
     assert_equal ["The 2nd of every month"], schedules.map(&:humanize)
   end
 
 
-  test "should infer a monthly (by weekday) schedule when one day was rescheduled" do
+  should "infer a monthly (by weekday) schedule when one day was rescheduled" do
     dates = %w{2012-10-02 2012-11-06 2012-12-05} # 1st Tuesday, 1st Tuesday, 1st Wednesday
     schedules = Schedule.infer(dates)
     assert_equal ["The first Tuesday of every month"], schedules.map(&:humanize)
   end
 
-  test "should infer a monthly (by weekday) schedule when the first day was rescheduled" do
+  should "infer a monthly (by weekday) schedule when the first day was rescheduled" do
     dates = %w{2012-10-03 2012-11-01 2012-12-06} # 1st Wednesday, 1st Thursday, 1st Thursday
     schedules = Schedule.infer(dates)
     assert_equal ["The first Thursday of every month"], schedules.map(&:humanize)
   end
 
-  test "should infer a monthly (by weekday) schedule when the first day was rescheduled 2" do
+  should "infer a monthly (by weekday) schedule when the first day was rescheduled 2" do
     dates = %w{2012-10-11 2012-11-01 2012-12-06} # 2nd Thursday, 1st Thursday, 1st Thursday
     schedules = Schedule.infer(dates)
     assert_equal ["The first Thursday of every month"], schedules.map(&:humanize)
@@ -162,13 +162,13 @@ class InferableTest < ActiveSupport::TestCase
 
   # Infers weekly schedules
 
-  test "should infer a weekly schedule" do
+  should "infer a weekly schedule" do
     dates = %w{2012-3-4 2012-3-11 2012-3-18}
     schedules = Schedule.infer(dates)
     assert_equal ["Every Sunday"], schedules.map(&:humanize)
   end
 
-  test "should infer a schedule that occurs several times a week" do
+  should "infer a schedule that occurs several times a week" do
     dates = %w{2012-3-6 2012-3-8 2012-3-13 2012-3-15 2012-3-20 2012-3-22}
     schedules = Schedule.infer(dates)
     assert_equal ["Every Tuesday and Thursday"], schedules.map(&:humanize)
@@ -177,7 +177,7 @@ class InferableTest < ActiveSupport::TestCase
 
   # ... with skips
 
-  test "should infer weekly recurrence for something that occurs every other week" do
+  should "infer weekly recurrence for something that occurs every other week" do
     dates = %w{2012-3-6 2012-3-8 2012-3-20 2012-3-22}
     schedules = Schedule.infer(dates)
     assert_equal ["Tuesday and Thursday of every other week"], schedules.map(&:humanize)
@@ -186,13 +186,13 @@ class InferableTest < ActiveSupport::TestCase
 
   # ... when some dates are missing from the input array
 
-  test "should infer a weekly schedule (missing dates)" do
+  should "infer a weekly schedule (missing dates)" do
     dates = %w{2012-3-4 2012-3-11 2012-3-25}
     schedules = Schedule.infer(dates)
     assert_equal ["Every Sunday"], schedules.map(&:humanize)
   end
 
-  test "should infer a schedule that occurs several times a week (missing dates)" do
+  should "infer a schedule that occurs several times a week (missing dates)" do
     dates = %w{2012-3-6 2012-3-8 2012-3-15 2012-3-20 2012-3-27 2012-3-29}
     schedules = Schedule.infer(dates)
     assert_equal ["Every Tuesday and Thursday"], schedules.map(&:humanize)
@@ -201,13 +201,13 @@ class InferableTest < ActiveSupport::TestCase
 
   # ... when some dates are wrong in the input group
 
-  test "should infer a weekly schedule when one day was rescheduled" do
+  should "infer a weekly schedule when one day was rescheduled" do
     dates = %w{2012-10-02 2012-10-09 2012-10-15} # a Tuesday, a Tuesday, and a Monday
     schedules = Schedule.infer(dates)
     assert_equal ["Every Tuesday"], schedules.map(&:humanize)
   end
 
-  test "should infer a weekly schedule when the first day was rescheduled" do
+  should "infer a weekly schedule when the first day was rescheduled" do
     dates = %w{2012-10-07 2012-10-10 2012-10-17} # a Sunday, a Wednesday, and a Wednesday
     schedules = Schedule.infer(dates)
     assert_equal ["Every Wednesday"], schedules.map(&:humanize)
@@ -218,7 +218,7 @@ class InferableTest < ActiveSupport::TestCase
 
   # Correctly identifies scenarios where there is no pattern
 
-  test "should not try to guess a pattern for input where there is none" do
+  should "not try to guess a pattern for input where there is none" do
     arbitrary_date_ranges = [
       %w{2013-01-01 2013-03-30 2014-08-19},
       %w{2012-10-01 2012-10-09 2012-10-17}, # a Monday, a Tuesday, and a Wednesday
@@ -230,7 +230,7 @@ class InferableTest < ActiveSupport::TestCase
     end
   end
 
-  test "should create one non-recurring schedule for each break if asked" do
+  should "create one non-recurring schedule for each break if asked" do
     dates = %w{2012-03-05 2012-11-28 2012-12-05 2012-12-12} # a random Monday, then three Wednesdays
     schedules = Schedule.infer(dates, allow_null_schedules: true)
 
@@ -239,7 +239,7 @@ class InferableTest < ActiveSupport::TestCase
 
 
 
-  test "should infer multiple schedules from mixed input" do
+  should "infer multiple schedules from mixed input" do
     dates = %w{2012-11-05 2012-11-12 2012-11-19 2012-11-28 2012-12-05 2012-12-12} # three Mondays then three Wednesdays
     schedules = Schedule.infer(dates)
 
@@ -248,13 +248,13 @@ class InferableTest < ActiveSupport::TestCase
 
 
 
-  test "should reject diabolically complex schedules by default" do
+  should "reject diabolically complex schedules by default" do
     dates = %w{2012-11-06 2012-11-08 2012-11-15 2012-11-20 2012-11-27 2012-11-29 2013-02-05 2013-02-14 2013-02-21 2013-02-19 2013-02-26 2013-05-07 2013-05-09 2013-05-16 2013-05-28 2013-05-21 2013-05-30}
     schedules = Schedule.infer(dates)
     refute_equal ["The first Tuesday, second Thursday, third Thursday, third Tuesday, fourth Tuesday, and fifth Thursday of every third month"], schedules.map(&:humanize)
   end
 
-  test "should infer diabolically complex schedules on demand" do
+  should "infer diabolically complex schedules on demand" do
     dates = %w{2012-11-06 2012-11-08 2012-11-15 2012-11-20 2012-11-27 2012-11-29 2013-02-05 2013-02-14 2013-02-21 2013-02-19 2013-02-26 2013-05-07 2013-05-09 2013-05-16 2013-05-28 2013-05-21 2013-05-30}
     schedules = Schedule.infer(dates, max_complexity: 99)
     assert_equal ["The first Tuesday, second Thursday, third Thursday, third Tuesday, fourth Tuesday, and fifth Thursday of every third month"], schedules.map(&:humanize)
