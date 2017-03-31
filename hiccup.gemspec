@@ -20,7 +20,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "ri_cal"
   s.add_development_dependency "bundler", "~> 1.10"
   s.add_development_dependency "rake", "~> 10.0"
-  s.add_development_dependency "minitest", "~> 5.0"
   s.add_development_dependency "minitest-reporters"
   s.add_development_dependency "minitest-reporters-turn_reporter"
   s.add_development_dependency "simplecov"
