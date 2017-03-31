@@ -36,7 +36,8 @@ module Hiccup
         :ends => ends,
         :end_date => end_date,
         :weekly_pattern => weekly_pattern,
-        :monthly_pattern => monthly_pattern
+        :monthly_pattern => monthly_pattern,
+        :skip => skip
       }
     end
 
