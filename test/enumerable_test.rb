@@ -90,7 +90,7 @@ class EnumerableTest < ActiveSupport::TestCase
     assert_equal expected_dates, dates,                 "occurrences_during_month did not correctly observe end date for weekly schedule"
   end
 
-  test "should keep weekly occurrences during a week together when skipping" do
+  should "keep weekly occurrences during a week together when skipping" do
     schedule = Schedule.new(
       :kind => :weekly,
       :weekly_pattern => %w{Tuesday Thursday},
@@ -235,7 +235,7 @@ class EnumerableTest < ActiveSupport::TestCase
 
 
 
-  test "should not throw an exception when calculating monthly recurrence and skip causes a guess to be discarded" do
+  should "not throw an exception when calculating monthly recurrence and skip causes a guess to be discarded" do
     schedule = Schedule.new({
       :kind => :monthly,
       :monthly_pattern => [
@@ -253,7 +253,7 @@ class EnumerableTest < ActiveSupport::TestCase
 
 
 
-  test "should not predict dates before the beginning of a schedule" do
+  should "not predict dates before the beginning of a schedule" do
     schedule = Schedule.new({
       :kind => :weekly,
       :weekly_pattern => %w{Monday},
@@ -266,7 +266,7 @@ class EnumerableTest < ActiveSupport::TestCase
     assert_equal [], schedule.n_occurrences_on_or_before(10, Date.new(2011,1,2))
   end
 
-  test "should predict nonrecurring dates before a date later than them" do
+  should "predict nonrecurring dates before a date later than them" do
     schedule = Schedule.new({
       :kind => :never,
       :start_date => Date.new(2011, 1, 3)})
@@ -274,7 +274,7 @@ class EnumerableTest < ActiveSupport::TestCase
     assert_equal [], schedule.n_occurrences_on_or_before(10, Date.new(2011,1,2))
   end
 
-  test "should not predict dates after the end of a schedule" do
+  should "not predict dates after the end of a schedule" do
     schedule = Schedule.new({
       :kind => :weekly,
       :weekly_pattern => %w{Monday},
