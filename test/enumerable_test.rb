@@ -260,8 +260,8 @@ class EnumerableTest < ActiveSupport::TestCase
       :start_date => Date.new(2011, 1, 3),
       :ends => true,
       :end_date => Date.new(2011, 1, 31)})
-    assert_equal nil, schedule.first_occurrence_before(Date.new(2011,1,3))
-    assert_equal nil, schedule.first_occurrence_on_or_before(Date.new(2011,1,2))
+    assert_nil schedule.first_occurrence_before(Date.new(2011,1,3))
+    assert_nil schedule.first_occurrence_on_or_before(Date.new(2011,1,2))
     assert_equal [], schedule.n_occurrences_before(10, Date.new(2011,1,3))
     assert_equal [], schedule.n_occurrences_on_or_before(10, Date.new(2011,1,2))
   end
@@ -281,8 +281,8 @@ class EnumerableTest < ActiveSupport::TestCase
       :start_date => Date.new(2011, 1, 3),
       :ends => true,
       :end_date => Date.new(2011, 1, 31)})
-    assert_equal nil, schedule.first_occurrence_after(Date.new(2011,1,31))
-    assert_equal nil, schedule.first_occurrence_on_or_after(Date.new(2011,2, 1))
+    assert_nil schedule.first_occurrence_after(Date.new(2011,1,31))
+    assert_nil schedule.first_occurrence_on_or_after(Date.new(2011,2, 1))
     assert_equal [], schedule.occurrences_between(Date.new(2013, 9, 23), Date.new(2013, 9, 30))
   end
 

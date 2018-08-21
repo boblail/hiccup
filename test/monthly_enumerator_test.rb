@@ -160,7 +160,7 @@ class MonthlyEnumeratorTest < ActiveSupport::TestCase
     should "always return nil" do
       date = Date.new(2015, 2, 1)
       enumerator = @schedule.enumerator.new(@schedule, date)
-      assert_equal nil, enumerator.next
+      assert_nil enumerator.next
     end
   end
 
