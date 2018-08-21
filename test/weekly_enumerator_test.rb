@@ -119,12 +119,12 @@ class WeeklyEnumeratorTest < ActiveSupport::TestCase
 
     should "return nil for prev rather than raising an exception" do
       enumerator = @schedule.enumerator.new(@schedule, Date.today)
-      assert_equal nil, enumerator.prev
+      assert_nil enumerator.prev
     end
 
     should "return nil for next rather than raising an exception" do
       enumerator = @schedule.enumerator.new(@schedule, Date.today)
-      assert_equal nil, enumerator.next
+      assert_nil enumerator.next
     end
   end
 
