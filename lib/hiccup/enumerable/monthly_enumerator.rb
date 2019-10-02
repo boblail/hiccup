@@ -7,7 +7,7 @@ module Hiccup
       def self.for(schedule)
         if schedule.monthly_pattern.empty?
           NeverEnumerator
-        elsif schedule.monthly_pattern.all? { |occurrence| Fixnum === occurrence }
+        elsif schedule.monthly_pattern.all? { |occurrence| Integer === occurrence }
           MonthlyDateEnumerator
         else
           self

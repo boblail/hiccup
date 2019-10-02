@@ -1,4 +1,4 @@
-class Fixnum
+class Integer
 
   # todo: complete
   def human_ordinalize(map={})
