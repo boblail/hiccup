@@ -1,5 +1,5 @@
 require "hiccup/convenience"
-require "hiccup/core_ext/fixnum"
+require "hiccup/core_ext/integer"
 
 
 module Hiccup

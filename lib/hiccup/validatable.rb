@@ -68,10 +68,10 @@ module Hiccup
     def valid_occurrence?(occurrence)
       if occurrence.is_a?(Array)
         i, wd = occurrence
-        Date::DAYNAMES.member?(wd) && i.is_a?(Fixnum) && ((i == -1) || (1..6).include?(i))
+        Date::DAYNAMES.member?(wd) && i.is_a?(Integer) && ((i == -1) || (1..6).include?(i))
       else
         i = occurrence
-        i.is_a?(Fixnum) && ([-1] + (1..31).to_a).include?(i)
+        i.is_a?(Integer) && ([-1] + (1..31).to_a).include?(i)
       end
     end
 
@@ -86,7 +86,7 @@ module Hiccup
     #     ordinal, kind = occurrence
     #
     #     errors.add(:kind, "is not a valid monthly occurrence kind") unless Date::DAYNAMES.member?(kind)
-    #     if ordinal.is_a?(Fixnum)
+    #     if ordinal.is_a?(Integer)
     #       errors.add(:ordinal, "is not a valid integer") unless (ordinal==-1) or (1..6).include?(ordinal)
     #     else
     #       errors.add(:ordinal, "is not an integer")
@@ -94,7 +94,7 @@ module Hiccup
     #   else
     #     ordinal = occurrence
     #
-    #     if ordinal.is_a?(Fixnum)
+    #     if ordinal.is_a?(Integer)
     #       errors.add(:ordinal, "is not an integer between 1 and 31") unless (1..31).include?(ordinal)
     #     else
     #       errors.add(:ordinal, "is not an integer")
