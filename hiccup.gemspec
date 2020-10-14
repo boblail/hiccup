@@ -11,8 +11,6 @@ Gem::Specification.new do |s|
   s.summary     = %q{A library for working with things that recur}
   s.description = %q{Hiccup mixes a-la-cart recurrence features into your data structure. It doesn't dictate the data structure, just the interface.}
 
-  s.rubyforge_project = "hiccup"
-
   s.add_dependency "activesupport", ">= 3.2.8"
   s.add_dependency "activemodel", ">= 3.2.8"
   s.add_dependency "builder"
