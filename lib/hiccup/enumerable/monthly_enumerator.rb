@@ -14,6 +14,11 @@ module Hiccup
         end
       end
 
+      def initialize(*args)
+        super
+        @position = nil
+      end
+
 
 
       def started?
